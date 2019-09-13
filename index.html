@@ -229,6 +229,164 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/13/Machine-Learning-Week1-Note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/13/Machine-Learning-Week1-Note/" itemprop="url">Machine Learning Week1 Note</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-13T23:02:24+08:00">
+                2019-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>此系列博文是学习Coursera上Stanford的《Machine Learning》MOOC的笔记。</p>
+<p>课程共分为11周，大约需要56小时学习。</p>
+<p>此文是第一周的笔记。</p>
+<h2 id="学习动机"><a href="#学习动机" class="headerlink" title="学习动机"></a>学习动机</h2><p>本课程是在同学的推荐下学习的，因为大四的两个项目都需要用到机器学习的知识和工具，所以需要先对机器学习有一个大概的了解。这门课程是很有名的。且Coursera上的评分为4.9，有250多万人注册过这门课！</p>
+<p>Ng的课程说明中对本门课程的定义为不仅</p>
+<p>##介绍</p>
+<p>机器学习的应用有：</p>
+<ol>
+<li>垃圾邮件拦截。</li>
+<li>网页搜索。</li>
+<li>电子相册的面孔识别</li>
+</ol>
+<p>机器学习适用的场景：代码不能手动编写出来。比如：</p>
+<ol>
+<li>直升机自动驾驶</li>
+<li>自然语言识别</li>
+<li>视觉识别</li>
+</ol>
+<p>机器学习在数据挖掘中的应用。</p>
+<p>推荐系统，点击流。</p>
+<h2 id="什么是机器学习？"><a href="#什么是机器学习？" class="headerlink" title="什么是机器学习？"></a>什么是机器学习？</h2><p>公认的机器学习的定义有两种说法。一种是Mitchell提出的ETP定义，一种是</p>
+<p>Arthur Samuel提出的学科定义。</p>
+<h3 id="ETP（Experience-Task-Performance）"><a href="#ETP（Experience-Task-Performance）" class="headerlink" title="ETP（Experience, Task, Performance）"></a>ETP（Experience, Task, Performance）</h3><blockquote>
+<p>A computer is said to learn from experience E with respect to some class of tasks T and performance measure P, if its performance at tasks in T, as measured by P, improves with experience E.</p>
+</blockquote>
+<p>Experience，实验经历。</p>
+<p>Task：任务。</p>
+<p>Performance：预测的准确度。</p>
+<h3 id="Samuel的学科定义"><a href="#Samuel的学科定义" class="headerlink" title="Samuel的学科定义"></a>Samuel的学科定义</h3><blockquote>
+<p>Machine Learning is the field of study gives computers that ability to learn without being explicitly programmed.</p>
+</blockquote>
+<p>机器学习是研究赋予不用显性的编写代码就能使计算机获得学习的能力的学科。</p>
+<h2 id="监督学习"><a href="#监督学习" class="headerlink" title="监督学习"></a>监督学习</h2><p>监督学习是指输入训练特征数据，并且告诉你正确的答案是什么，然后再输入未知的特征，通过对之前的数据挖掘出规律预测未知输入对应的输出。</p>
+<p>监督学习需要使用标记好的特征数据训练。</p>
+<p>监督学习可分为两种形式。一种是分类（Classification），分类的结果是离散有限的。另外一种是回归（regression），回归的输出结果是连续的。以卖房为例，分类的结果可以是预测指定房子在未来三个月是否能卖出去。而回归的结果可以是符合指定条件（比如面积和地段）的房子的预期价格。价格既可以是10000，也可以是10001.23。</p>
+<p>在上面的例子中，面积和地段是学习模型的两个特征，除了它们以外，可能的特征还有小区绿化率、1公里内的地铁站的数量等等特征。如果需要，甚至可以使用近乎无穷数量的特征进行监督学习。</p>
+<h2 id="非监督学习"><a href="#非监督学习" class="headerlink" title="非监督学习"></a>非监督学习</h2><p>非监督学习不需要知道输入数据的标签和分类，而是通过输入数据的结构聚类（Clustering）。比如google新闻推荐，自动以一个新闻事件为主题，聚集相关的新闻报道。或者社交网络中人群分类都可以使用非监督学习进行。</p>
+<p>课程中举了一个Cokcktail Party Problem的问题。即通过两个不同位置的声源分离出环境音和人声。</p>
+<p><strong>TODO：实现一个算法</strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/11/阅读日报20190911/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -624,7 +782,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -637,7 +795,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
