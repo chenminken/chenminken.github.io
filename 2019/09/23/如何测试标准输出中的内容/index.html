@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="软件测试,">
 
 
 
@@ -79,14 +79,18 @@
 
 
 
+<meta name="description" content="标准输出：System.out.println() 方法流程：  使用OutputStream, System.setOut重定向输出流 使用System.getProperty(&amp;quot;line.separator)来正确的测试下一行 使用System.setOut, System.out恢复输出流   样例代码1234567891011121314151617181920212223242">
+<meta name="keywords" content="软件测试">
 <meta property="og:type" content="article">
-<meta property="og:title" content="软件测试week1 note">
-<meta property="og:url" content="http://yoursite.com/2019/09/09/软件测试week1-note/index.html">
+<meta property="og:title" content="如何测试标准输出中的内容">
+<meta property="og:url" content="http://yoursite.com/2019/09/23/如何测试标准输出中的内容/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
+<meta property="og:description" content="标准输出：System.out.println() 方法流程：  使用OutputStream, System.setOut重定向输出流 使用System.getProperty(&amp;quot;line.separator)来正确的测试下一行 使用System.setOut, System.out恢复输出流   样例代码1234567891011121314151617181920212223242">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-09-09T07:24:43.855Z">
+<meta property="og:updated_time" content="2019-09-23T07:20:58.182Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="软件测试week1 note">
+<meta name="twitter:title" content="如何测试标准输出中的内容">
+<meta name="twitter:description" content="标准输出：System.out.println() 方法流程：  使用OutputStream, System.setOut重定向输出流 使用System.getProperty(&amp;quot;line.separator)来正确的测试下一行 使用System.setOut, System.out恢复输出流   样例代码1234567891011121314151617181920212223242">
 
 
 
@@ -116,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/09/09/软件测试week1-note/">
+  <link rel="canonical" href="http://yoursite.com/2019/09/23/如何测试标准输出中的内容/">
 
 
 
 
 
-  <title>软件测试week1 note | ChenMin's Blog</title>
+  <title>如何测试标准输出中的内容 | ChenMin's Blog</title>
   
 
 
@@ -229,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/09/软件测试week1-note/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/23/如何测试标准输出中的内容/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Chen Min">
@@ -246,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">软件测试week1 note</h1>
+          <h1 class="post-title" itemprop="name headline">如何测试标准输出中的内容</h1>
         
 
         <div class="post-meta">
@@ -258,8 +262,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-09T15:23:33+08:00">
-                2019-09-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-23T15:23:33+08:00">
+                2019-09-23
               </time>
             
 
@@ -296,7 +300,18 @@
       
 
       
-        
+        <p>标准输出：<code>System.out.println()</code></p>
+<p>方法流程：</p>
+<ol>
+<li>使用<code>OutputStream, System.setOut</code>重定向输出流</li>
+<li>使用<code>System.getProperty(&quot;line.separator)</code>来正确的测试下一行</li>
+<li>使用<code>System.setOut, System.out</code>恢复输出流</li>
+</ol>
+<hr>
+<h2 id="样例代码"><a href="#样例代码" class="headerlink" title="样例代码"></a>样例代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PrintClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"Just follow your heard"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrintClassTest.java,忽略掉import的部分</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClassTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrintSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 重定向标准输出到指定printstream中</span></span><br><span class="line">		OutputStream os = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">		PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">		System.setOut(ps);</span><br><span class="line">		<span class="comment">// 执行测试代码</span></span><br><span class="line">		PrintClass pc = <span class="keyword">new</span> PrintClass();</span><br><span class="line">		pc.printSome();</span><br><span class="line">		assertEquals(<span class="string">"Just follow your heard"</span></span><br><span class="line">						+ System.getProperty(<span class="string">"line.separator"</span>),</span><br><span class="line">                os.toString());</span><br><span class="line">		<span class="comment">// 恢复重定向</span></span><br><span class="line">		PrintStream originalOut = System.out;</span><br><span class="line">    	System.setOut(originalOut);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码在：。。。</p>
+
       
     </div>
     
@@ -311,6 +326,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/软件测试/" rel="tag"># 软件测试</a>
+          
+        </div>
+      
 
       
       
@@ -320,8 +341,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/08/重建博客/" rel="next" title="重建博客">
-                <i class="fa fa-chevron-left"></i> 重建博客
+              <a href="/2019/09/16/软件测试week3-note/" rel="next" title="软件测试week3 note">
+                <i class="fa fa-chevron-left"></i> 软件测试week3 note
               </a>
             
           </div>
@@ -329,10 +350,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/09/11/阅读日报20190911/" rel="prev" title="阅读日报20190911">
-                阅读日报20190911 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -384,8 +401,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -446,6 +472,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#样例代码"><span class="nav-number">1.</span> <span class="nav-text">样例代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
