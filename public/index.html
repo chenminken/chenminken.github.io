@@ -229,6 +229,1095 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/01/Kaldi入门-一-yesno项目/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/01/Kaldi入门-一-yesno项目/" itemprop="url">Kaldi入门(一):yesno项目</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-01T17:37:05+08:00">
+                2020-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这个学期选了一门自然语言处理课，结果这门课主要的研究课题是自动语音识别（ASR）。既然入了这个坑。就先好好了解一下如何做ASR吧。<br>老师Tom Ko要求使用Kaldi这个工具来做ASR。课上到一半才知道Kaldi中有几千行的脚本代码是老师提交的。好吧，脚本好难的。<br>为了入门Kaldi，课程的第5次Lab是一个mini projec: yesno</p>
+<p>首先要下载并编译Kaldi，安装的过程不是我的学习重点，可以先参考<a href="[https://blog.csdn.net/snowdroptulip/article/details/78896915](https://blog.csdn.net/snowdroptulip/article/details/78896915)">Kaldi的下载安装与编译</a>，在漫长的编译过程之后假设已经安装好了Kaldi。</p>
+<h2 id="项目目录结构"><a href="#项目目录结构" class="headerlink" title="项目目录结构"></a>项目目录结构</h2><p>yesno项目的脚本和README都在<code>kaldi/egs/yesno</code>之下。<br>README.txt文件中包含数据集描述：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">The "yesno" corpus is a very small dataset of recordings of one individual</span><br><span class="line">saying yes or no multiple times per recording, in Hebrew.  It is available from</span><br><span class="line">http://www.openslr.org/1.</span><br><span class="line">It is mainly included here as an easy way to test out the Kaldi scripts.</span><br><span class="line"></span><br><span class="line">The test set is perfectly recognized at the monophone stage, so the dataset is</span><br><span class="line">not exactly challenging.</span><br><span class="line"></span><br><span class="line">The scripts are in s5/.</span><br></pre></td></tr></table></figure>
+
+<p>数据脚本路径： kaldi/egs/yesno/s5。在下面执行的很多操作都可以直接调用已经写好的脚本来执行，之所以深入到具体的流程中是为了加强对ASR流程的理解。</p>
+<h2 id="下载数据集"><a href="#下载数据集" class="headerlink" title="下载数据集"></a>下载数据集</h2><p>第一步是从网络上下载数据集文件<code>waves_yesno.tar.gz</code>到s5/路径下并解压。<br>原始的数据是60个.wav文件。文件名是八个用下划线分隔的01组合。需要将音频数据转化成kaldi能够处理的格式。</p>
+<h2 id="转换成Kaldi能处理的格式"><a href="#转换成Kaldi能处理的格式" class="headerlink" title="转换成Kaldi能处理的格式"></a>转换成Kaldi能处理的格式</h2><p>下载完数据集后，将数据集划分为31个训练，30个测试（数量大致相当）。在s5/下创建data文件夹，把划分好的音频文件放入train_yesno和test_yesno。</p>
+<p>Kaldi使用以下几个文件来表示数据：</p>
+<ol>
+<li><p>Text<br>音频的文本记录。每一个音频文件一行。格式为<code>&lt;utt_id&gt; &lt;transcript&gt;</code>。<utt_id>为音频的id，一般用不带扩展名的文件名表示。utt_id在wav.scp文件中与具体的文件映射。<transcript>是音频对应的文字。</transcript></utt_id></p>
+</li>
+<li><p>wav.scp<br>将文件映射到唯一的utt_id。<br>格式为<code>&lt;utt_id&gt; &lt;path or command to get wave file&gt;</code><br>第二个参数既可以是对应utt_id的音频文件路径，也可以是能够获得音频文件的指令。</p>
+</li>
+<li><p>utt2spk<br>对于每一个音频文件，标记是哪一个人发音的。因为yesno数据集中只有一个发音者，用global来表示所有的utt_id<br>文件内每一行的格式为<code>&lt;utt_id&gt; &lt;speaker_id&gt;</code></p>
+</li>
+<li><p>spk2utt<br>和3反过来。文件内每一行对应一个发音者，第一个是speaker的id，后面用空格分隔开60个utt_id。格式为<code>&lt;speaker_id&gt; &lt;utt_id1&gt; &lt;utt_id2&gt; ...</code></p>
+</li>
+</ol>
+<p>本步骤可直接调用脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> kaldi/egs/yesno/s5</span><br><span class="line"><span class="built_in">local</span>/prepare_data.sh waves_yesno</span><br></pre></td></tr></table></figure>
+
+<p>读了一下prepare_data.sh的脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"></span><br><span class="line">mkdir -p data/<span class="built_in">local</span></span><br><span class="line"><span class="built_in">local</span>=`<span class="built_in">pwd</span>`/<span class="built_in">local</span></span><br><span class="line">scripts=`<span class="built_in">pwd</span>`/scripts</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:`<span class="built_in">pwd</span>`/../../../tools/irstlm/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Preparing train and test data"</span></span><br><span class="line"></span><br><span class="line">train_base_name=train_yesno</span><br><span class="line">test_base_name=test_yesno</span><br><span class="line">waves_dir=<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line">ls -1 <span class="variable">$waves_dir</span> &gt; data/<span class="built_in">local</span>/waves_all.list</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> data/<span class="built_in">local</span></span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_waves_test_train.pl waves_all.list waves.test waves.train</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_wav_scp.pl <span class="variable">$&#123;waves_dir&#125;</span> waves.test &gt; <span class="variable">$&#123;test_base_name&#125;</span>_wav.scp</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_wav_scp.pl <span class="variable">$&#123;waves_dir&#125;</span> waves.train &gt; <span class="variable">$&#123;train_base_name&#125;</span>_wav.scp</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_txt.pl waves.test &gt; <span class="variable">$&#123;test_base_name&#125;</span>.txt</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_txt.pl waves.train &gt; <span class="variable">$&#123;train_base_name&#125;</span>.txt</span><br><span class="line"></span><br><span class="line">cp ../../input/task.arpabo lm_tg.arpa</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> ../..</span><br><span class="line"></span><br><span class="line"><span class="comment"># This stage was copied from WSJ example</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> train_yesno test_yesno; <span class="keyword">do</span></span><br><span class="line">  mkdir -p data/<span class="variable">$x</span></span><br><span class="line">  cp data/<span class="built_in">local</span>/<span class="variable">$&#123;x&#125;</span>_wav.scp data/<span class="variable">$x</span>/wav.scp</span><br><span class="line">  cp data/<span class="built_in">local</span>/<span class="variable">$x</span>.txt data/<span class="variable">$x</span>/text</span><br><span class="line">  cat data/<span class="variable">$x</span>/text | awk <span class="string">'&#123;printf("%s global\n", $1);&#125;'</span> &gt; data/<span class="variable">$x</span>/utt2spk</span><br><span class="line">  utils/utt2spk_to_spk2utt.pl &lt;data/<span class="variable">$x</span>/utt2spk &gt;data/<span class="variable">$x</span>/spk2utt</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="建立词典"><a href="#建立词典" class="headerlink" title="建立词典"></a>建立词典</h2><p>对于当前项目，我们只有两个词 Ken(yes) 和 Lo（no)。但是在真实的语言中，词的数量不可能这么少，并且还有停顿和环境噪声。kaldi将这些非语言的声音称作slience（SIL）。<br>加上SIL一共需要三个词来表示当前这个yesno语言模型。</p>
+<p>调用脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">local</span>/prepare_dict.sh</span><br></pre></td></tr></table></figure>
+
+<p>将会在s5/data/local/dict中看到新生成的5个文件。</p>
+<ol>
+<li><p>lexicon.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;SIL&gt; SIL</span><br><span class="line">YES Y</span><br><span class="line">NO N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>lexicon_words.txt<br>比1少第一行</p>
+</li>
+<li><p>nonsilence_phones.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Y</span><br><span class="line">N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>silence_phones.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SIL</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>optional_silence.txt<br>和4一样</p>
+</li>
+</ol>
+<p>这个脚本本身只是将input文件夹下面的lexicon_nosil.txt，lexicon.txt， phones.txt复制到dict所在目录，并且加上SIL。</p>
+<h2 id="语言模型"><a href="#语言模型" class="headerlink" title="语言模型"></a>语言模型</h2><p>接下来要做语言模型。<br>项目提供了一个一元的语言模型。然而我们需要将这个模型转换成一个WFST（一种有穷自动机）<br>执行:<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">utils/prepare_lang.sh --position-dependent-phones <span class="literal">false</span> data/<span class="built_in">local</span>/dict/ <span class="string">"&lt;SIL&gt;"</span> data/<span class="built_in">local</span>/lang/ data/lang</span><br><span class="line"><span class="built_in">local</span>/prepare_lm.sh</span><br></pre></td></tr></table></figure></p>
+<p>prepare_lang.sh的开头注释如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># This script prepares a directory such as data/lang/, in the standard format,</span><br><span class="line"># given a source directory containing a dictionary lexicon.txt in a form like:</span><br><span class="line"># word phone1 phone2 ... phoneN</span><br><span class="line"># per line (alternate prons would be separate lines), or a dictionary with probabilities</span><br><span class="line"># called lexiconp.txt in a form:</span><br><span class="line"># word pron-prob phone1 phone2 ... phoneN</span><br><span class="line"># (with 0.0 &lt; pron-prob &lt;= 1.0); note: if lexiconp.txt exists, we use it even if</span><br><span class="line"># lexicon.txt exists.</span><br><span class="line"># and also files silence_phones.txt, nonsilence_phones.txt, optional_silence.txt</span><br><span class="line"># and extra_questions.txt</span><br><span class="line"># Here, silence_phones.txt and nonsilence_phones.txt are lists of silence and</span><br><span class="line"># non-silence phones respectively (where silence includes various kinds of</span><br><span class="line"># noise, laugh, cough, filled pauses etc., and nonsilence phones includes the</span><br><span class="line"># &quot;real&quot; phones.)</span><br><span class="line"># In each line of those files is a list of phones, and the phones on each line</span><br><span class="line"># are assumed to correspond to the same &quot;base phone&quot;, i.e. they will be</span><br><span class="line"># different stress or tone variations of the same basic phone.</span><br><span class="line"># The file &quot;optional_silence.txt&quot; contains just a single phone (typically SIL)</span><br><span class="line"># which is used for optional silence in the lexicon.</span><br><span class="line"># extra_questions.txt might be empty; typically will consist of lists of phones,</span><br><span class="line"># all members of each list with the same stress or tone; and also possibly a</span><br><span class="line"># list for the silence phones.  This will augment the automatically generated</span><br><span class="line"># questions (note: the automatically generated ones will treat all the</span><br><span class="line"># stress/tone versions of a phone the same, so will not &quot;get to ask&quot; about</span><br><span class="line"># stress or tone).</span><br></pre></td></tr></table></figure>
+
+<p>通过阅读脚本和脚本中的注释。可以知道<code>prepare_lang.sh</code>的用法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Usage: utils/prepare_lang.sh &lt;dict-src-dir&gt; &lt;oov-dict-entry&gt; &lt;tmp-dir&gt; &lt;lang-dir&gt;</span><br><span class="line">e.g.: utils/prepare_lang.sh data/local/dict &lt;SPOKEN_NOISE&gt; data/local/lang data/lang</span><br><span class="line">--position-dependent-phones (true|false)        # default: true; if true, use _B, _E, _S &amp; _I</span><br></pre></td></tr></table></figure>
+
+<p><dict-src-dir>是我们在上一部分生成的词典目录。需要包含lexico.txt，extra_questions.txt，nonsilence_phones.txt，optional_silence.txt  silence_phones.txt。<br><code>position_dependent_phones</code>参数为false，导致解码后不能算出单词边界。很多的脚本，特别是评分脚本将不能正常运行。<br>第二个指令将语言模型转换成G.fst格式并保存在data/lang_test_tg 目录下。<br>这个脚本的核心内容是调用了arpa2fst和fstisstochastic，再创建了G.fst之后检查是否有空字符（<s>,</s>之类的）的循环。</dict-src-dir></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arpa2fst --disambig-symbol=#0 --read-symbol-table=$test/words.txt input/task.arpabo $test/G.fst</span><br><span class="line"></span><br><span class="line">fstisstochastic $test/G.fst</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://blog.csdn.net/yutianzuijin/article/details/78756130" target="_blank" rel="noopener">arpa2fst 原理详解</a></p>
+<blockquote>
+<p>arpa文件可以很容易地表示任意n-gram语言模型，不过在实际中n通常等于3、4或者5。arpa文件的每一行表示一个文法项，它通常包含三部分内容：probability word(s) [backoff probability]。probability表示该词或词组发生的概率，word(s)表示具体的词或者词组。backoff probablitiy是可选项，表示回退概率。</p>
+</blockquote>
+<p>在yesno这个toy project中只使用1元的语言模型。对应的arpa文件在<code>input/task.arpabo</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">\data\</span><br><span class="line">ngram 1=4</span><br><span class="line"></span><br><span class="line">\1-grams:</span><br><span class="line">-1	NO</span><br><span class="line">-1	YES</span><br><span class="line">-99 &lt;s&gt;</span><br><span class="line">-1 &lt;/s&gt;</span><br><span class="line"></span><br><span class="line">\end\</span><br></pre></td></tr></table></figure>
+
+<p>fstisstochastic命令则如同其名字的含义一样，用来检查G.fst是否是随机的。<br>在<code>s5/data/lang</code>目录下会出现：</p>
+<ol>
+<li><p><code>phones.txt</code>:将phone转换成数字。其中#0，#1是空字，用来表示句子的开头和结尾。<eps> 是一个特别的含义表示这个弧上没有符号。</eps></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;eps&gt; 0</span><br><span class="line">SIL 1</span><br><span class="line">Y 2</span><br><span class="line">N 3</span><br><span class="line">#0 4</span><br><span class="line">#1 5</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>words.txt</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;eps&gt; 0</span><br><span class="line">&lt;SIL&gt; 1</span><br><span class="line">NO 2</span><br><span class="line">YES 3</span><br><span class="line">#0 4</span><br><span class="line">&lt;s&gt; 5</span><br><span class="line">&lt;/s&gt; 6</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>L_disambig.fst, L.fs</code>t: the dict can be recognized by Kaldi</p>
+</li>
+<li><p><code>topo</code>: phone states transition(HMM)</p>
+</li>
+<li><p><code>oov</code>: out of vocabulary. 仅包含<code>&lt;SIL&gt;</code></p>
+</li>
+<li><p><code>phones</code>: some information about phones</p>
+</li>
+</ol>
+<h2 id="特征提取和训练"><a href="#特征提取和训练" class="headerlink" title="特征提取和训练"></a>特征提取和训练</h2><p>MFCC特征提取和GMM-HMM建模</p>
+<p>提取梅尔倒谱系数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">steps/make_mfcc.sh --nj $num $input_dir $log_dir $output_dir</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://zhuanlan.zhihu.com/p/60371062" target="_blank" rel="noopener">语音信号处理（二）—— MFCC详解</a><br>梅尔倒谱系数是一种非线性的时频表示法，其应用了人耳对低频声音的听觉敏感度更高的原理。</p>
+<p>接着正则化倒谱特征</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">steps/compute_cmvn_stats.sh </span><br><span class="line">utils/fix_data_dir.sh $input_dir</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://placebokkk.github.io/kaldi/2019/08/05/asr-kaldi-feat2.html" target="_blank" rel="noopener">Kaldi中的特征提取(二）- 特征变换</a><br>对训练集和测试集做同样的操作。<br>这里我采用的参数是 $num=1 $output_dir=mfcc<br>那么结果将会保存在mfcc文件夹下。<br>cmvn_test_yesno.ark  cmvn_test_yesno.scp  cmvn_train_yesno.ark  cmvn_train_yesno.scp。<br>ark文件包含特征向量（用cat打开是乱码），scp文件是关系文件，从发音者到ark文件的对应。<br>也可以直接跑脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">num=1 </span><br><span class="line">output_dir=mfcc</span><br><span class="line">for x in train_yesno test_yesno; do</span><br><span class="line">  steps/make_mfcc.sh --nj 1 data/$x exp/make_mfcc/$x mfcc  </span><br><span class="line">  steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x mfcc        </span><br><span class="line">  utils/fix_data_dir.sh data/$x </span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<h2 id="单音素模型训练"><a href="#单音素模型训练" class="headerlink" title="单音素模型训练"></a>单音素模型训练</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">steps/train_mono.sh —nj $N —cmd $MAIN_CMD $DATA_DIR $LANG_DIR $OUTPUT_DIR</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：<br>—nj：job的数量，来自同一个speaker的语音不能并行处理。所以在本项目中只能选择为1。<br>—cmd：为了使用本机的资源，调用”utils/run.pl”</p>
+<p>运行脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_cmd=&quot;utils/run.pl&quot; steps/train_mono.sh --nj 1 --cmd &quot;$train_cmd&quot; \   </span><br><span class="line">--totgauss 400 \   </span><br><span class="line">data/train_yesno data/lang exp/mono0a</span><br></pre></td></tr></table></figure>
+
+<p>到现在我们已经完成了模型的训练。</p>
+<h2 id="解码和测试"><a href="#解码和测试" class="headerlink" title="解码和测试"></a>解码和测试</h2><p>接下来用测试集来验证一下模型的准确与否。<br>第一步是创建一个全连接的FST网络。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">utils/mkgraph.sh data/lang_test_tg exp/mono0a exp/mono0a/graph_tgpr</span><br></pre></td></tr></table></figure>
+
+<p>这个指令背后的脚本很长。基本上做的事情是创建以一个HCLG（HMM+Context+Lexicon+Grammer）的解码器并保存在exp/mono0a/graph_tgpr中。<br>还记得我们的每一条语音都是8个连续的Ken或Lo吗(Ken，Lo是希伯来语的yes no）?训练好的模型的工作就是找出这8个词的顺序。<br><code>steps/decode.sh [options] &lt;graph-dir&gt; &lt;data-dir&gt; &lt;decode-dir&gt;</code>用来寻找每一个测试音频的最佳路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">decode_cmd=&quot;utils/run.pl&quot; steps/decode.sh --nj 1 --cmd &quot;$decode_cmd&quot; \</span><br><span class="line">exp/mono0a/graph_tgpr data/test_yesno exp/mono0a/decode_test_yesno</span><br></pre></td></tr></table></figure>
+
+<p>最后是查看结果的环节。<br>在decode.sh内部最后会调用score.sh，这个脚本则生成预测的结果并且计算测试集Word error rate（WER）。<br>调用下列命令可以看到最好的效果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">for x in exp/*/decode*; do [ -d $x ] &amp;&amp; grep WER $x/wer_* | utils/best_wer.sh;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ] exp/mono0a/decode_test_yesno/wer_10_0.0</span><br></pre></td></tr></table></figure>
+
+<p>解读一下结果，花了很长时间才弄懂这些东西是什么意思。<br>WER后跟着的0.00是说字的错误率为0，即准确率为100%。<br>测试集一共29条音频，每条音频有8个字（单音素的字）。一共232个字。<br>参考Stanford的cs224s-17.lec04.pdf</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-dc5c0fcaf24b3750.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WER的计算方法"><br><img src="https://upload-images.jianshu.io/upload_images/4328467-1c85e0672f7772cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt><br>而wer结果文件中的10和0.0分别是lmwt(Language Weight)和wip(word insertion penalty，词插入惩罚)。lmwt用来平衡LM（语言模型）在多大程度上帮助AM（语音模型）<img src="https://upload-images.jianshu.io/upload_images/4328467-3e2341231bb987fa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="LMWT用途 
+https://skemman.is/bitstream/1946/31280/1/msc_anna_vigdis_2018.pdf"><br>至于<a href="https://www.zhihu.com/question/31416764/answer/353868805" target="_blank" rel="noopener">wip</a>：</p>
+<blockquote>
+<p>word insertion penalty, 简写WIP, 是HMM识别匹配过程中用于设置句长的一个参数，可以用来调节生成句子中的单词个数，当前主流的语音识别系统主要采用的都是音素识别，即根据单词的音标而不是单词来进行匹配，这就导致了，在识别过程中，可能很难确定单词的gap，如果让系统自由识别，根据参数初始化的模型来进行匹配的话有可能会生成一些诡异的由长单词构成的句子，或者有很多短单词构成的句子，这些匹配率很低的句子对HMM参数的优化作用很小，同时也很大概率会导致学习速率奇慢或者局部最优解这样的问题，所以通过设置这个参数来得到一些更符合语义结构的生成片段。</p>
+</blockquote>
+<p>最后，我们调用的所有脚本都在run.sh中。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/10/python程序同步webdav网盘（坚果云、owncloud）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/01/10/python程序同步webdav网盘（坚果云、owncloud）/" itemprop="url">python程序同步webdav网盘（坚果云、owncloud)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-10T11:58:06+08:00">
+                2020-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在编写一个Django项目的时候有定时备份数据文件的需求。因为项目运行在云服务器中，担心的是服务器挂掉，所以备份的地方不能是同一台服务器。在这个项目里自己去建一个服务器来管理备份数据显得没有必要。目前网络存储提供商有许多家，我选取的方案是编写python定时程序连接支持WebDAV协议的网盘，例如坚果云和owncloud。</p>
+<p>分为两部分：</p>
+<ol>
+<li>Python同步代码编写</li>
+<li>Django定时任务编写</li>
+</ol>
+<h2 id="Python同步代码编写"><a href="#Python同步代码编写" class="headerlink" title="Python同步代码编写"></a>Python同步代码编写</h2><p>使用<a href="https://pypi.org/project/webdavclient3/" target="_blank" rel="noopener">webdavclient3</a>库来处理webDAV协议的部分。先安装：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install webdavclient3</span><br></pre></td></tr></table></figure>
+
+<p>然后在自己的项目的某个地方建立一个py文件。我选的是<code>[项目目录]\utils\backup\backup.py</code></p>
+<p>编写python代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> webdav3.client <span class="keyword">import</span> Client</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">from</span> webdav3.exceptions <span class="keyword">import</span> LocalResourceNotFound</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"><span class="comment"># invoke this function every day.</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upload</span><span class="params">()</span>:</span></span><br><span class="line">    options = &#123;</span><br><span class="line">        <span class="string">'webdav_hostname'</span>: <span class="string">"网盘地址，如果是坚果云，不能只输入/dav/路径，似乎这个文件夹不能访问，在下面再建一个文件夹，比如backup。网址中需要有backup的地址比如https://dav.jianguoyun.com/dav/backup"</span>,</span><br><span class="line">        <span class="string">'webdav_login'</span>: <span class="string">"用户名"</span>,</span><br><span class="line">        <span class="string">'webdav_password'</span>: <span class="string">"密码，如果是坚果云填写应用密码"</span>,</span><br><span class="line">        <span class="string">'disable_check'</span>: <span class="literal">True</span>, <span class="comment">#有的网盘不支持check功能</span></span><br><span class="line">    &#125;</span><br><span class="line">    client = Client(options)</span><br><span class="line">		<span class="comment"># 我选择用时间戳为备份文件命名</span></span><br><span class="line">    file_name = str(math.floor(datetime.now().timestamp())) + <span class="string">'.bak'</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 写死的路径，第一个参数是网盘地址</span></span><br><span class="line">        client.upload(<span class="string">'backup/'</span> + file_name, <span class="string">'本地地址，绝对路径'</span>)</span><br><span class="line">        <span class="comment"># 打印结果，之后会重定向到log</span></span><br><span class="line">        print(<span class="string">'upload at '</span> + file_name)</span><br><span class="line">    <span class="keyword">except</span> LocalResourceNotFound <span class="keyword">as</span> exception:</span><br><span class="line">        print(<span class="string">'An error happen: LocalResourceNotFound ---'</span>  + file_name)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果是直接调用文件，执行upload()</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">'run upload'</span>)</span><br><span class="line">    upload()</span><br></pre></td></tr></table></figure>
+
+<p>Python的代码相对简短。只需要在服务器的命令行执行<code>python upload.py</code>，备份文件自动上传到网盘。然而还不完整，这个程序的目的是定期执行。接下来结合Django的定期执行接口做到每日备份。</p>
+<h2 id="Django定时任务编写"><a href="#Django定时任务编写" class="headerlink" title="Django定时任务编写"></a>Django定时任务编写</h2><p>Django是目前很流行的python web服务框架。通过django自带的命令创建project和app（这一部分不讲）。</p>
+<p>当项目建好后，使用<code>python manage.py</code>可以运行项目、数据库代码整合。开发者可以通过继承BaseCommand类来自定义命令，然后再通过django_crontab定期执行命令。或者不通过自定义命令，直接使用django_crontab定期执行函数。</p>
+<h3 id="创建backupCmd命令"><a href="#创建backupCmd命令" class="headerlink" title="创建backupCmd命令"></a>创建backupCmd命令</h3><p>在之前创建的app下新建management/commands目录，在该目录下新建<code>backupCmd.py</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from django.core.management.base import BaseCommand</span><br><span class="line">from utils.backup.backup import upload</span><br><span class="line"></span><br><span class="line">class Command(BaseCommand):</span><br><span class="line">    def handle(self, *args, **options):</span><br><span class="line">        upload()</span><br></pre></td></tr></table></figure>
+
+<p>当完成后，在项目根目录下执行<code>python manage.py backupCmd</code>就可以单次执行程序了。</p>
+<p>在setting.py尾部添加:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 运行定时函数，每天1点运行。</span><br><span class="line">CRONJOBS = [</span><br><span class="line">    (&apos;0 01 * * *&apos;, &apos;utils.backup.backup&apos;,&apos;&gt;&gt; ~/test_crontab.log&apos;)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 运行定时命令， </span><br><span class="line">CRONJOBS = [</span><br><span class="line">    (&apos;*/1 * * * *&apos;, &apos;django.core.management.call_command&apos;, [&apos;backupCmd&apos;], &#123;&#125;, &apos;&gt;&gt; ~/test_crontab.log&apos;),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>然后执行<code>python manage.py crontab add</code>，定时任务加入其中。</p>
+<p>当时间到达的时候，程序将自动运行。日志会输出到<code>~/test_crontab.log</code>中。</p>
+<p>linux中的定时任务crontab的语法如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*  *  *  *  * command</span><br><span class="line">分钟(0-59) 小时(0-23) 每个月的哪一天(1-31) 月份(1-12) 周几(0-6) shell脚本或者命令</span><br></pre></td></tr></table></figure>
+
+<p>对于使用到的网盘，希望能够付费支持一下。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/27/用python写一个过滤器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/27/用python写一个过滤器/" itemprop="url">用python写一个过滤器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-27T17:17:31+08:00">
+                2019-09-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>计算机视觉课Assigment2的内容.</p>
+<p>要求写出一个图像的过滤器出来。</p>
+<h2 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h2><p><strong>Image Filtering.</strong>Image filtering (or convolution) is a fundamental image processing tool. You will be writing your own function to implement image filtering from scratch. More specifically, you will implement my_imfilter()which imitates the filter2Dfunction in the OpenCV library. As specified in student_code.py, your filtering algorithm must</p>
+<p>(1) support grayscale and color images</p>
+<p>(2) support arbitrary shaped filters, as long as both dimensions are odd</p>
+<p>(e.g. 7x9 filters but not 4x5 filters)</p>
+<p>(3) pad the input image with zeros or reflected image content</p>
+<p>(4) return a filtered image which is the same resolution as the input image.</p>
+<p>使用numpy，PIL。</p>
+<h2 id="步骤："><a href="#步骤：" class="headerlink" title="步骤："></a>步骤：</h2><ol>
+<li>导入图像（不属于本次任务）</li>
+<li>生成过滤核（不属于本次任务）</li>
+<li>padding</li>
+<li>calculate</li>
+<li>normalization（不属于本次任务，即假设过滤核和图像已经做好了正则化）</li>
+<li>截断</li>
+</ol>
+<hr>
+<h2 id="函数定义"><a href="#函数定义" class="headerlink" title="函数定义"></a>函数定义</h2><p>图像过滤器的核心是一个function，函数的定义</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_imfilter</span><span class="params">(image, filter)</span></span></span><br><span class="line"><span class="function">	<span class="title">return</span> <span class="title">filtered_image</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>输入的图像为image，image可以为黑白或者RGB彩色。（channel=1 or channel=3)</p>
+<p>所以输入的image.ndim可能为2或者为3.</p>
+<p>第一部分代码需要判断黑白和彩色的情况.</p>
+<p>图片过滤器会将原图片的尺寸缩小,因为进行卷积操作是将原图像的一个矩阵框中的点和过滤核相乘后在求和得到新图像的一个点的值。</p>
+<p>【公式和图像】</p>
+<p>假设原始图像的高和宽为img_h, img_w，过滤核的大小为filter_h, filter_w。这里有一个条件过滤核的长宽都必须为为奇数。（为什么呢？）那么除掉最中心的像素外，过滤核可以被分为四等份。每一部分的长宽(padding)为 pad_h = (filter_h-1)/2和pad_w = (filter_w-1)/2</p>
+<p>那么输出的尺寸为img_h - pad_h * 2 和 img_w - pad_w *2，因为图像两边都需要减去pad_h的尺寸。</p>
+<p>同时我们还要给过滤器做一个上下左右变换。因为卷积操作和相关操作的过滤核移动方向是相反的，应该是从下往上，从右往左。</p>
+<h2 id="实例代码："><a href="#实例代码：" class="headerlink" title="实例代码："></a>实例代码：</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_imfilter</span><span class="params">(image, filter)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  Apply a filter to an image. Return the filtered image.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  Args</span></span><br><span class="line"><span class="string">  - image: numpy nd-array of dim (m, n, c)</span></span><br><span class="line"><span class="string">  - filter: numpy nd-array of dim (k, k)</span></span><br><span class="line"><span class="string">  Returns</span></span><br><span class="line"><span class="string">  - filtered_image: numpy nd-array of dim (m, n, c)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  HINTS:</span></span><br><span class="line"><span class="string">  - You may not use any libraries that do the work for you. Using numpy to work</span></span><br><span class="line"><span class="string">   with matrices is fine and encouraged. Using opencv or similar to do the</span></span><br><span class="line"><span class="string">   filtering for you is not allowed.</span></span><br><span class="line"><span class="string">  - I encourage you to try implementing this naively first, just be aware that</span></span><br><span class="line"><span class="string">   it may take an absurdly long time to run. You will need to get a function</span></span><br><span class="line"><span class="string">   that takes a reasonable amount of time to run so that the TAs can verify</span></span><br><span class="line"><span class="string">   your code works.</span></span><br><span class="line"><span class="string">  - Remember these are RGB images, accounting for the final image dimension.</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">assert</span> filter.shape[<span class="number">0</span>] % <span class="number">2</span> == <span class="number">1</span></span><br><span class="line">  <span class="keyword">assert</span> filter.shape[<span class="number">1</span>] % <span class="number">2</span> == <span class="number">1</span></span><br><span class="line">  <span class="comment"># 默认设置图像的通道数，如果只有一个通道，即输入图片是二维的。</span></span><br><span class="line">  channel = <span class="number">1</span></span><br><span class="line">  <span class="comment"># 如果输入维度=3，通道数等于第三个维度的元素数量</span></span><br><span class="line">  <span class="keyword">if</span> image.ndim == <span class="number">3</span>:</span><br><span class="line">    channel = image.shape[<span class="number">2</span>]</span><br><span class="line">  <span class="comment"># 获取图片的长度和宽度</span></span><br><span class="line">  image_h, image_w = image.shape[:<span class="number">2</span>]</span><br><span class="line">  <span class="comment"># 将过滤核做上下、左右翻转，以确保是卷积操作而不是相关操作</span></span><br><span class="line">  filter = np.flipud(filter)</span><br><span class="line">  filter = np.fliplr(filter)</span><br><span class="line">  <span class="comment"># 获取过滤核的长度和宽度</span></span><br><span class="line">  filter_h, filter_w = filter.shape</span><br><span class="line">  pad_h = (filter_h - <span class="number">1</span>) // <span class="number">2</span></span><br><span class="line">  pad_w = (filter_w - <span class="number">1</span>) // <span class="number">2</span></span><br><span class="line">  <span class="comment"># 先扩充原图像,为了不影响原图像，需要复制一份图像</span></span><br><span class="line">  image_cp = image.copy()</span><br><span class="line">  image_cp = np.pad(image_cp,[(pad_h,pad_h),(pad_w,pad_w),(<span class="number">0</span>,<span class="number">0</span>)],<span class="string">"constant"</span>)</span><br><span class="line">  <span class="comment"># 生成过滤后的图片的空容器，尺寸可以是原本的尺寸，在这里为了下面坐标转换方便，扩大了长宽。</span></span><br><span class="line">  filtered_image = np.zeros(image_cp.shape)</span><br><span class="line">  <span class="comment"># 第一层是对于不同的channel做卷积  </span></span><br><span class="line">  <span class="keyword">for</span> i <span class="keyword">in</span> range(channel):</span><br><span class="line">    <span class="comment"># 第二层是高度y轴像素遍历</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(pad_h,image_h+pad_h):</span><br><span class="line">        <span class="comment"># 第三层是宽度x轴像素遍历</span></span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> range(pad_w,image_w+pad_w):</span><br><span class="line">            <span class="comment"># 算法核心，加上上面的翻转式卷积操作，单独来看是相关操作。其实可以通过 step=-1来做</span></span><br><span class="line">            filtered_image[j,k,i] = np.sum(np.multiply(image_cp[j-pad_h:j+pad_h+<span class="number">1</span>,k-pad_w:k+pad_w+<span class="number">1</span>,i],filter))</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> filtered_image[pad_h:image_h+pad_h, pad_w:image_w+pad_w,:]</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>相关链接：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/33194385" target="_blank" rel="noopener">卷积与互相关的一点探讨</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/" itemprop="url">用阿里云服务器自己搭建2do同步caldav服务器</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-23T17:33:29+08:00">
+                2019-09-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="用阿里云服务器自己搭建2do同步caldav服务器"><a href="#用阿里云服务器自己搭建2do同步caldav服务器" class="headerlink" title="用阿里云服务器自己搭建2do同步caldav服务器"></a>用阿里云服务器自己搭建2do同步caldav服务器</h2><p>一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。<br>因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。<br>流程非常简单。一个小时以内就可办完。<br>使用到的:</p>
+<ol>
+<li>阿里云ECS低配版，如果使用学生版一个月9.5元。</li>
+<li>python3。</li>
+<li>radicale，使用python3编写的caldav服务器程序。</li>
+</ol>
+<h3 id="步骤一览"><a href="#步骤一览" class="headerlink" title="步骤一览:"></a>步骤一览:</h3><ol>
+<li>云服务器购买与登录</li>
+<li>安全组设置</li>
+<li>Python3环境</li>
+<li>安装radicale</li>
+<li>配置radicale</li>
+</ol>
+<hr>
+<h3 id="云服务器准备"><a href="#云服务器准备" class="headerlink" title="云服务器准备"></a>云服务器准备</h3><p>购买与登录的流程就自己搜索吧。我购买的是Ubunt的主机，也可以使用CentOS。</p>
+<p>需要注意的是在创建服务器实例之前，最好先将本机的ssh public key导入到阿里云中，并且新建实例后选择该public key，不然不能够在终端中登录，而阿里云提供的浏览器vnc完全不能用。也可以在创建实例后再创建public key，只是需要重启实例罢了。</p>
+<h3 id="安全组设置"><a href="#安全组设置" class="headerlink" title="安全组设置"></a>安全组设置</h3><p>阿里云默认关闭大多数端口，包括了我们这次要使用到的5232端口。所以请自行搜索“阿里云 安全组 端口开启“完成该步骤。</p>
+<h3 id="Python3的环境搭建"><a href="#Python3的环境搭建" class="headerlink" title="Python3的环境搭建"></a>Python3的环境搭建</h3><p>这一步大体上也是请搜索“Ubuntu python3“</p>
+<p>需要注意的是先使用<code>sudo apt-get update</code>更新本地软件目录。</p>
+<h3 id="安装radicale"><a href="#安装radicale" class="headerlink" title="安装radicale"></a>安装radicale</h3><p>这一步会很详细的讲。</p>
+<p>安装radicale</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m pip install --upgrade radicale</span><br></pre></td></tr></table></figure>
+
+<p>若是在本地使用，可以使用下面这个命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m radicale --config "" --storage-filesystem-folder=~/.var/lib/radicale/collections</span><br></pre></td></tr></table></figure>
+
+<p>然后访问 <a href="http://localhost:5232" target="_blank" rel="noopener">http://localhost:5232</a></p>
+<p>但是若在服务器上访问就无法访问。需要配置参数。</p>
+<p>我使用的配置有，把配置文件放在<code>/etc/radicale/config</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[server]</span><br><span class="line"># Bind all addresses</span><br><span class="line">hosts = 0.0.0.0:5232</span><br><span class="line">daemon = True</span><br><span class="line">[auth]</span><br><span class="line">type = htpasswd</span><br><span class="line">htpasswd_filename = /etc/radicale/users</span><br><span class="line">htpasswd_encryption = plain</span><br><span class="line">[storage]</span><br><span class="line">filesystem_folder = ~/.var/lib/radicale/collections</span><br></pre></td></tr></table></figure>
+
+<p>想详细了解更多配置选项可以查看<a href="https://radicale.org/configuration/" target="_blank" rel="noopener">configuration</a></p>
+<p>然后可以设置用户名和密码, 把配置文件放在<code>/etc/radicale/users</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user:password</span><br></pre></td></tr></table></figure>
+
+<p>然后启动就好了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m radicale</span><br></pre></td></tr></table></figure>
+
+<p>正常访问。</p>
+<p>然后在2Do的配置上选择就好了。</p>
+<p><img src="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg" alt="2do"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/23/如何测试那些难以测试的方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/23/如何测试那些难以测试的方法/" itemprop="url">如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-23T15:23:33+08:00">
+                2019-09-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="如何测试标准输出中的内容"><a href="#如何测试标准输出中的内容" class="headerlink" title="如何测试标准输出中的内容"></a>如何测试标准输出中的内容</h2><p>标准输出：<code>System.out.println()</code></p>
+<p>方法流程：</p>
+<ol>
+<li>使用<code>OutputStream, System.setOut</code>重定向输出流</li>
+<li>使用<code>System.getProperty(&quot;line.separator)</code>来正确的测试下一行</li>
+<li>使用<code>System.setOut, System.out</code>恢复输出流</li>
+</ol>
+<hr>
+<h3 id="样例代码"><a href="#样例代码" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PrintClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"Just follow your heard"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrintClassTest.java,忽略掉import的部分</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClassTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrintSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 重定向标准输出到指定printstream中</span></span><br><span class="line">		OutputStream os = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">		PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">		System.setOut(ps);</span><br><span class="line">		<span class="comment">// 执行测试代码</span></span><br><span class="line">		PrintClass pc = <span class="keyword">new</span> PrintClass();</span><br><span class="line">		pc.printSome();</span><br><span class="line">		assertEquals(<span class="string">"Just follow your heard"</span></span><br><span class="line">						+ System.getProperty(<span class="string">"line.separator"</span>),</span><br><span class="line">                os.toString());</span><br><span class="line">		<span class="comment">// 恢复重定向</span></span><br><span class="line">		PrintStream originalOut = System.out;</span><br><span class="line">    	System.setOut(originalOut);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/printtest" target="_blank" rel="noopener">week2:printtest</a></p>
+<h2 id="如何测试私有方法"><a href="#如何测试私有方法" class="headerlink" title="如何测试私有方法"></a>如何测试私有方法</h2><p>Java中的私有方法不能通过obj.method()的方式来调用。如果需要测试私有方法怎么办？</p>
+<p>使用反射机制获取这个私有方法。</p>
+<p>需要使用到的方法<code>Class.getDeclaredMethod(), Method.setAccessible(), Method.invoke()</code></p>
+<p>方法流程：</p>
+<ol>
+<li>获取需要测试类的class对象（可以使用class.forname的方法，也可以直接使用[ClassName].class的方法）</li>
+<li>获取该class对象指定的私有方法的Method对象（<code>[classobj.class].getDeclaredMethod(String name, Class&lt;?&gt;... parameterTypes)</code>）</li>
+<li>修改私有方法的访问性为公开访问(<code>[MethodObj].setAccessible(true)</code>。</li>
+<li>实例化需要测试类的object对象(<code>[ClassName.class].newInstance()</code>)</li>
+<li>调用该私有方法测试(<code>[MethodObj].invoke([objectInstance], ...)</code>)</li>
+</ol>
+<hr>
+<h3 id="样例代码-1"><a href="#样例代码-1" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PrivateMethodClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">privatePlus</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> a + b;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrivateMethodClassTest.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClassTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrivatePlus1</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException </span>&#123;</span><br><span class="line">        Class cls = Class.forName(<span class="string">"PrivateMethodClass"</span>);</span><br><span class="line">        Method msd = cls.getDeclaredMethod(<span class="string">"privatePlus"</span>, <span class="keyword">int</span>.class, <span class="keyword">int</span>.class);</span><br><span class="line">        msd.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        Object obj = cls.newInstance();</span><br><span class="line">        <span class="keyword">int</span> res = (Integer)msd.invoke(obj, <span class="number">4</span>,<span class="number">6</span>);</span><br><span class="line">        assertEquals(<span class="number">10</span>, res);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/privateTest" target="_blank" rel="noopener">week2:privateTest</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/16/软件测试week3-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/16/软件测试week3-note/" itemprop="url">软件测试week3 note</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-16T10:22:47+08:00">
+                2019-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/16/软件测试week2-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/16/软件测试week2-note/" itemprop="url">软件测试week2 note</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-16T08:33:07+08:00">
+                2019-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Fault-failure-and-error"><a href="#Fault-failure-and-error" class="headerlink" title="Fault, failure and error"></a>Fault, failure and error</h2><p>example</p>
+<h2 id="为什么软件测试变得越来越重要？"><a href="#为什么软件测试变得越来越重要？" class="headerlink" title="为什么软件测试变得越来越重要？"></a>为什么软件测试变得越来越重要？</h2><h2 id="测试过程的成熟等级"><a href="#测试过程的成熟等级" class="headerlink" title="测试过程的成熟等级"></a>测试过程的成熟等级</h2><p>Level 0</p>
+<p>Level 1</p>
+<p>Level 2</p>
+<p>Level 3</p>
+<p>Level 4</p>
+<h2 id="每一个测试的目的是什么？"><a href="#每一个测试的目的是什么？" class="headerlink" title="每一个测试的目的是什么？"></a>每一个测试的目的是什么？</h2><h2 id="什么时候开始测试？"><a href="#什么时候开始测试？" class="headerlink" title="什么时候开始测试？"></a>什么时候开始测试？</h2><h2 id="不测试的代价？"><a href="#不测试的代价？" class="headerlink" title="不测试的代价？"></a>不测试的代价？</h2><h2 id="我们为何要测试软件？"><a href="#我们为何要测试软件？" class="headerlink" title="我们为何要测试软件？"></a>我们为何要测试软件？</h2><h2 id="软件活动中的测试等级"><a href="#软件活动中的测试等级" class="headerlink" title="软件活动中的测试等级"></a>软件活动中的测试等级</h2><h2 id="软件的可测试性（Software-Testability）"><a href="#软件的可测试性（Software-Testability）" class="headerlink" title="软件的可测试性（Software Testability）"></a>软件的可测试性（Software Testability）</h2><h2 id="可观测性和可控制性（Observability-and-Controllability）"><a href="#可观测性和可控制性（Observability-and-Controllability）" class="headerlink" title="可观测性和可控制性（Observability and Controllability）"></a>可观测性和可控制性（Observability and Controllability）</h2><h2 id="一个测试样例的组成部分"><a href="#一个测试样例的组成部分" class="headerlink" title="一个测试样例的组成部分"></a>一个测试样例的组成部分</h2><h2 id="自动化测试框架"><a href="#自动化测试框架" class="headerlink" title="自动化测试框架"></a>自动化测试框架</h2><p>Junit</p>
+<h2 id="Hamcrest-Common-Matchers"><a href="#Hamcrest-Common-Matchers" class="headerlink" title="Hamcrest Common Matchers"></a>Hamcrest Common Matchers</h2><h2 id="如何测试标准输出中的字符串？"><a href="#如何测试标准输出中的字符串？" class="headerlink" title="如何测试标准输出中的字符串？"></a>如何测试标准输出中的字符串？</h2><h2 id="如何测试Main方法？"><a href="#如何测试Main方法？" class="headerlink" title="如何测试Main方法？"></a>如何测试Main方法？</h2>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/13/Machine-Learning-Week1-Note/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -305,8 +1394,7 @@
 <p>此文是第一周的笔记。</p>
 <h2 id="学习动机"><a href="#学习动机" class="headerlink" title="学习动机"></a>学习动机</h2><p>本课程是在同学的推荐下学习的，因为大四的两个项目都需要用到机器学习的知识和工具，所以需要先对机器学习有一个大概的了解。这门课程是很有名的。且Coursera上的评分为4.9，有250多万人注册过这门课！</p>
 <p>Ng的课程说明中对本门课程的定义为不仅</p>
-<p>##介绍</p>
-<p>机器学习的应用有：</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>机器学习的应用有：</p>
 <ol>
 <li>垃圾邮件拦截。</li>
 <li>网页搜索。</li>
@@ -616,129 +1704,13 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/08/重建博客/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Chen Min">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ChenMin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/08/重建博客/" itemprop="url">重建博客</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-08T21:51:25+08:00">
-                2019-09-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>2019年4月的时候用hexo和github page创建过一个博客，但是在更换电脑的时候意外丢失了模版。后又恢复回来，只剩下了网页，，没有网站配置和md原始文件。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -782,7 +1754,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -794,10 +1766,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">2</span>
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">tags</span>
-                
+                </a>
               </div>
             
 
@@ -805,6 +1777,16 @@
 
           
 
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.github.com/chenminken" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+            </div>
           
 
           
@@ -832,7 +1814,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

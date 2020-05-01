@@ -1,7 +1,9 @@
 ---
 title: Machine Learning Week1 Note
 date: 2019-09-13 23:02:24
-tags: MachineLearning, Coursera
+tags: 
+- MachineLearning
+- Coursera
 ---
 
 此系列博文是学习Coursera上Stanford的《Machine Learning》MOOC的笔记。
@@ -16,7 +18,7 @@ tags: MachineLearning, Coursera
 
 Ng的课程说明中对本门课程的定义为不仅
 
-##介绍
+## 介绍
 
 机器学习的应用有：
 

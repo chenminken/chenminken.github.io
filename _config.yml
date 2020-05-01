@@ -13,7 +13,6 @@ timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -52,11 +51,14 @@ index_generator:
   path: ''
   per_page: 10
   order_by: -date
-  
+
+menu:
+  home: /
+  archives: /archives
+  tags: /tags
+
 # Category & Tag
 default_category: uncategorized
-category_map:
-tag_map:
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
@@ -81,3 +83,8 @@ deploy:
   type: git
   repo: https://github.com/chenminken/chenminken.github.io
   branch: master
+
+
+
+social:
+  GitHub: https://www.github.com/chenminken

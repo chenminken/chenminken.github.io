@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="用阿里云服务器自己搭建2do同步caldav服务器一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。流程非常简单。一个小时以内就可办完。使用">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用阿里云服务器自己搭建2do同步caldav服务器">
+<meta property="og:url" content="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/index.html">
+<meta property="og:site_name" content="ChenMin&#39;s Blog">
+<meta property="og:description" content="用阿里云服务器自己搭建2do同步caldav服务器一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。流程非常简单。一个小时以内就可办完。使用">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg">
+<meta property="og:updated_time" content="2019-09-23T15:12:33.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用阿里云服务器自己搭建2do同步caldav服务器">
+<meta name="twitter:description" content="用阿里云服务器自己搭建2do同步caldav服务器一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。流程非常简单。一个小时以内就可办完。使用">
+<meta name="twitter:image" content="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/">
+
+
+
+
+
+  <title>用阿里云服务器自己搭建2do同步caldav服务器 | ChenMin's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ChenMin's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">用阿里云服务器自己搭建2do同步caldav服务器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-23T17:33:29+08:00">
+                2019-09-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="用阿里云服务器自己搭建2do同步caldav服务器"><a href="#用阿里云服务器自己搭建2do同步caldav服务器" class="headerlink" title="用阿里云服务器自己搭建2do同步caldav服务器"></a>用阿里云服务器自己搭建2do同步caldav服务器</h2><p>一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。<br>因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。<br>流程非常简单。一个小时以内就可办完。<br>使用到的:</p>
+<ol>
+<li>阿里云ECS低配版，如果使用学生版一个月9.5元。</li>
+<li>python3。</li>
+<li>radicale，使用python3编写的caldav服务器程序。</li>
+</ol>
+<h3 id="步骤一览"><a href="#步骤一览" class="headerlink" title="步骤一览:"></a>步骤一览:</h3><ol>
+<li>云服务器购买与登录</li>
+<li>安全组设置</li>
+<li>Python3环境</li>
+<li>安装radicale</li>
+<li>配置radicale</li>
+</ol>
+<hr>
+<h3 id="云服务器准备"><a href="#云服务器准备" class="headerlink" title="云服务器准备"></a>云服务器准备</h3><p>购买与登录的流程就自己搜索吧。我购买的是Ubunt的主机，也可以使用CentOS。</p>
+<p>需要注意的是在创建服务器实例之前，最好先将本机的ssh public key导入到阿里云中，并且新建实例后选择该public key，不然不能够在终端中登录，而阿里云提供的浏览器vnc完全不能用。也可以在创建实例后再创建public key，只是需要重启实例罢了。</p>
+<h3 id="安全组设置"><a href="#安全组设置" class="headerlink" title="安全组设置"></a>安全组设置</h3><p>阿里云默认关闭大多数端口，包括了我们这次要使用到的5232端口。所以请自行搜索“阿里云 安全组 端口开启“完成该步骤。</p>
+<h3 id="Python3的环境搭建"><a href="#Python3的环境搭建" class="headerlink" title="Python3的环境搭建"></a>Python3的环境搭建</h3><p>这一步大体上也是请搜索“Ubuntu python3“</p>
+<p>需要注意的是先使用<code>sudo apt-get update</code>更新本地软件目录。</p>
+<h3 id="安装radicale"><a href="#安装radicale" class="headerlink" title="安装radicale"></a>安装radicale</h3><p>这一步会很详细的讲。</p>
+<p>安装radicale</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m pip install --upgrade radicale</span><br></pre></td></tr></table></figure>
+
+<p>若是在本地使用，可以使用下面这个命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m radicale --config "" --storage-filesystem-folder=~/.var/lib/radicale/collections</span><br></pre></td></tr></table></figure>
+
+<p>然后访问 <a href="http://localhost:5232" target="_blank" rel="noopener">http://localhost:5232</a></p>
+<p>但是若在服务器上访问就无法访问。需要配置参数。</p>
+<p>我使用的配置有，把配置文件放在<code>/etc/radicale/config</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[server]</span><br><span class="line"># Bind all addresses</span><br><span class="line">hosts = 0.0.0.0:5232</span><br><span class="line">daemon = True</span><br><span class="line">[auth]</span><br><span class="line">type = htpasswd</span><br><span class="line">htpasswd_filename = /etc/radicale/users</span><br><span class="line">htpasswd_encryption = plain</span><br><span class="line">[storage]</span><br><span class="line">filesystem_folder = ~/.var/lib/radicale/collections</span><br></pre></td></tr></table></figure>
+
+<p>想详细了解更多配置选项可以查看<a href="https://radicale.org/configuration/" target="_blank" rel="noopener">configuration</a></p>
+<p>然后可以设置用户名和密码, 把配置文件放在<code>/etc/radicale/users</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user:password</span><br></pre></td></tr></table></figure>
+
+<p>然后启动就好了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m radicale</span><br></pre></td></tr></table></figure>
+
+<p>正常访问。</p>
+<p>然后在2Do的配置上选择就好了。</p>
+<p><img src="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg" alt="2do"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/23/如何测试那些难以测试的方法/" rel="next" title="如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)">
+                <i class="fa fa-chevron-left"></i> 如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/27/用python写一个过滤器/" rel="prev" title="用python写一个过滤器">
+                用python写一个过滤器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chen Min</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.github.com/chenminken" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#用阿里云服务器自己搭建2do同步caldav服务器"><span class="nav-number">1.</span> <span class="nav-text">用阿里云服务器自己搭建2do同步caldav服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤一览"><span class="nav-number">1.1.</span> <span class="nav-text">步骤一览:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#云服务器准备"><span class="nav-number">1.2.</span> <span class="nav-text">云服务器准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安全组设置"><span class="nav-number">1.3.</span> <span class="nav-text">安全组设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3的环境搭建"><span class="nav-number">1.4.</span> <span class="nav-text">Python3的环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装radicale"><span class="nav-number">1.5.</span> <span class="nav-text">安装radicale</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chen Min</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
