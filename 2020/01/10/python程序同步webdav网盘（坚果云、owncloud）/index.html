@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
 <meta property="og:description" content="在编写一个Django项目的时候有定时备份数据文件的需求。因为项目运行在云服务器中，担心的是服务器挂掉，所以备份的地方不能是同一台服务器。在这个项目里自己去建一个服务器来管理备份数据显得没有必要。目前网络存储提供商有许多家，我选取的方案是编写python定时程序连接支持WebDAV协议的网盘，例如坚果云和owncloud。 分为两部分：  Python同步代码编写 Django定时任务编写  Py">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-01-10T05:08:37.267Z">
+<meta property="og:updated_time" content="2020-01-10T05:11:13.340Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="python程序同步webdav网盘（坚果云、owncloud)">
 <meta name="twitter:description" content="在编写一个Django项目的时候有定时备份数据文件的需求。因为项目运行在云服务器中，担心的是服务器挂掉，所以备份的地方不能是同一台服务器。在这个项目里自己去建一个服务器来管理备份数据显得没有必要。目前网络存储提供商有许多家，我选取的方案是编写python定时程序连接支持WebDAV协议的网盘，例如坚果云和owncloud。 分为两部分：  Python同步代码编写 Django定时任务编写  Py">
@@ -329,6 +329,9 @@
 <p>当时间到达的时候，程序将自动运行。日志会输出到<code>~/test_crontab.log</code>中。</p>
 <p>linux中的定时任务crontab的语法如下:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*  *  *  *  * command</span><br><span class="line">分钟(0-59) 小时(0-23) 每个月的哪一天(1-31) 月份(1-12) 周几(0-6) shell脚本或者命令</span><br></pre></td></tr></table></figure>
+
+<p>对于使用到的网盘，希望能够付费支持一下。</p>
+
       
     </div>
     
@@ -361,6 +364,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/01/Kaldi入门-一-yesno项目/" rel="prev" title="Kaldi入门(一):yesno项目">
+                Kaldi入门(一):yesno项目 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -437,7 +444,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -450,7 +457,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>

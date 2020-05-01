@@ -229,6 +229,241 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/01/Kaldi入门-一-yesno项目/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/01/Kaldi入门-一-yesno项目/" itemprop="url">Kaldi入门(一):yesno项目</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-01T17:37:05+08:00">
+                2020-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这个学期选了一门自然语言处理课，结果这门课主要的研究课题是自动语音识别（ASR）。既然入了这个坑。就先好好了解一下如何做ASR吧。<br>老师Tom Ko要求使用Kaldi这个工具来做ASR。课上到一半才知道Kaldi中有几千行的脚本代码是老师提交的。好吧，脚本好难的。<br>为了入门Kaldi，课程的第5次Lab是一个mini projec: yesno</p>
+<p>首先要下载并编译Kaldi，安装的过程不是我的学习重点，可以先参考<a href="[https://blog.csdn.net/snowdroptulip/article/details/78896915](https://blog.csdn.net/snowdroptulip/article/details/78896915)">Kaldi的下载安装与编译</a>，在漫长的编译过程之后假设已经安装好了Kaldi。</p>
+<h2 id="项目目录结构"><a href="#项目目录结构" class="headerlink" title="项目目录结构"></a>项目目录结构</h2><p>yesno项目的脚本和README都在<code>kaldi/egs/yesno</code>之下。<br>README.txt文件中包含数据集描述：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">The "yesno" corpus is a very small dataset of recordings of one individual</span><br><span class="line">saying yes or no multiple times per recording, in Hebrew.  It is available from</span><br><span class="line">http://www.openslr.org/1.</span><br><span class="line">It is mainly included here as an easy way to test out the Kaldi scripts.</span><br><span class="line"></span><br><span class="line">The test set is perfectly recognized at the monophone stage, so the dataset is</span><br><span class="line">not exactly challenging.</span><br><span class="line"></span><br><span class="line">The scripts are in s5/.</span><br></pre></td></tr></table></figure>
+
+<p>数据脚本路径： kaldi/egs/yesno/s5。在下面执行的很多操作都可以直接调用已经写好的脚本来执行，之所以深入到具体的流程中是为了加强对ASR流程的理解。</p>
+<h2 id="下载数据集"><a href="#下载数据集" class="headerlink" title="下载数据集"></a>下载数据集</h2><p>第一步是从网络上下载数据集文件<code>waves_yesno.tar.gz</code>到s5/路径下并解压。<br>原始的数据是60个.wav文件。文件名是八个用下划线分隔的01组合。需要将音频数据转化成kaldi能够处理的格式。</p>
+<h2 id="转换成Kaldi能处理的格式"><a href="#转换成Kaldi能处理的格式" class="headerlink" title="转换成Kaldi能处理的格式"></a>转换成Kaldi能处理的格式</h2><p>下载完数据集后，将数据集划分为31个训练，30个测试（数量大致相当）。在s5/下创建data文件夹，把划分好的音频文件放入train_yesno和test_yesno。</p>
+<p>Kaldi使用以下几个文件来表示数据：</p>
+<ol>
+<li><p>Text<br>音频的文本记录。每一个音频文件一行。格式为<code>&lt;utt_id&gt; &lt;transcript&gt;</code>。<utt_id>为音频的id，一般用不带扩展名的文件名表示。utt_id在wav.scp文件中与具体的文件映射。<transcript>是音频对应的文字。</transcript></utt_id></p>
+</li>
+<li><p>wav.scp<br>将文件映射到唯一的utt_id。<br>格式为<code>&lt;utt_id&gt; &lt;path or command to get wave file&gt;</code><br>第二个参数既可以是对应utt_id的音频文件路径，也可以是能够获得音频文件的指令。</p>
+</li>
+<li><p>utt2spk<br>对于每一个音频文件，标记是哪一个人发音的。因为yesno数据集中只有一个发音者，用global来表示所有的utt_id<br>文件内每一行的格式为<code>&lt;utt_id&gt; &lt;speaker_id&gt;</code></p>
+</li>
+<li><p>spk2utt<br>和3反过来。文件内每一行对应一个发音者，第一个是speaker的id，后面用空格分隔开60个utt_id。格式为<code>&lt;speaker_id&gt; &lt;utt_id1&gt; &lt;utt_id2&gt; ...</code></p>
+</li>
+</ol>
+<p>本步骤可直接调用脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> kaldi/egs/yesno/s5</span><br><span class="line"><span class="built_in">local</span>/prepare_data.sh waves_yesno</span><br></pre></td></tr></table></figure>
+
+<p>读了一下prepare_data.sh的脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"></span><br><span class="line">mkdir -p data/<span class="built_in">local</span></span><br><span class="line"><span class="built_in">local</span>=`<span class="built_in">pwd</span>`/<span class="built_in">local</span></span><br><span class="line">scripts=`<span class="built_in">pwd</span>`/scripts</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:`<span class="built_in">pwd</span>`/../../../tools/irstlm/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Preparing train and test data"</span></span><br><span class="line"></span><br><span class="line">train_base_name=train_yesno</span><br><span class="line">test_base_name=test_yesno</span><br><span class="line">waves_dir=<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line">ls -1 <span class="variable">$waves_dir</span> &gt; data/<span class="built_in">local</span>/waves_all.list</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> data/<span class="built_in">local</span></span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_waves_test_train.pl waves_all.list waves.test waves.train</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_wav_scp.pl <span class="variable">$&#123;waves_dir&#125;</span> waves.test &gt; <span class="variable">$&#123;test_base_name&#125;</span>_wav.scp</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_wav_scp.pl <span class="variable">$&#123;waves_dir&#125;</span> waves.train &gt; <span class="variable">$&#123;train_base_name&#125;</span>_wav.scp</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_txt.pl waves.test &gt; <span class="variable">$&#123;test_base_name&#125;</span>.txt</span><br><span class="line"></span><br><span class="line">../../<span class="built_in">local</span>/create_yesno_txt.pl waves.train &gt; <span class="variable">$&#123;train_base_name&#125;</span>.txt</span><br><span class="line"></span><br><span class="line">cp ../../input/task.arpabo lm_tg.arpa</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> ../..</span><br><span class="line"></span><br><span class="line"><span class="comment"># This stage was copied from WSJ example</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> train_yesno test_yesno; <span class="keyword">do</span></span><br><span class="line">  mkdir -p data/<span class="variable">$x</span></span><br><span class="line">  cp data/<span class="built_in">local</span>/<span class="variable">$&#123;x&#125;</span>_wav.scp data/<span class="variable">$x</span>/wav.scp</span><br><span class="line">  cp data/<span class="built_in">local</span>/<span class="variable">$x</span>.txt data/<span class="variable">$x</span>/text</span><br><span class="line">  cat data/<span class="variable">$x</span>/text | awk <span class="string">'&#123;printf("%s global\n", $1);&#125;'</span> &gt; data/<span class="variable">$x</span>/utt2spk</span><br><span class="line">  utils/utt2spk_to_spk2utt.pl &lt;data/<span class="variable">$x</span>/utt2spk &gt;data/<span class="variable">$x</span>/spk2utt</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="建立词典"><a href="#建立词典" class="headerlink" title="建立词典"></a>建立词典</h2><p>对于当前项目，我们只有两个词 Ken(yes) 和 Lo（no)。但是在真实的语言中，词的数量不可能这么少，并且还有停顿和环境噪声。kaldi将这些非语言的声音称作slience（SIL）。<br>加上SIL一共需要三个词来表示当前这个yesno语言模型。</p>
+<p>调用脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">local</span>/prepare_dict.sh</span><br></pre></td></tr></table></figure>
+
+<p>将会在s5/data/local/dict中看到新生成的5个文件。</p>
+<ol>
+<li><p>lexicon.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;SIL&gt; SIL</span><br><span class="line">YES Y</span><br><span class="line">NO N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>lexicon_words.txt<br>比1少第一行</p>
+</li>
+<li><p>nonsilence_phones.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Y</span><br><span class="line">N</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>silence_phones.txt</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SIL</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>optional_silence.txt<br>和4一样</p>
+</li>
+</ol>
+<p>这个脚本本身只是将input文件夹下面的lexicon_nosil.txt，lexicon.txt， phones.txt复制到dict所在目录，并且加上SIL。</p>
+<h2 id="语言模型"><a href="#语言模型" class="headerlink" title="语言模型"></a>语言模型</h2><p>接下来要做语言模型。<br>项目提供了一个一元的语言模型。然而我们需要将这个模型转换成一个WFST（一种有穷自动机）<br>执行:<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">utils/prepare_lang.sh --position-dependent-phones <span class="literal">false</span> data/<span class="built_in">local</span>/dict/ <span class="string">"&lt;SIL&gt;"</span> data/<span class="built_in">local</span>/lang/ data/lang</span><br><span class="line"><span class="built_in">local</span>/prepare_lm.sh</span><br></pre></td></tr></table></figure></p>
+<p>prepare_lang.sh的开头注释如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># This script prepares a directory such as data/lang/, in the standard format,</span><br><span class="line"># given a source directory containing a dictionary lexicon.txt in a form like:</span><br><span class="line"># word phone1 phone2 ... phoneN</span><br><span class="line"># per line (alternate prons would be separate lines), or a dictionary with probabilities</span><br><span class="line"># called lexiconp.txt in a form:</span><br><span class="line"># word pron-prob phone1 phone2 ... phoneN</span><br><span class="line"># (with 0.0 &lt; pron-prob &lt;= 1.0); note: if lexiconp.txt exists, we use it even if</span><br><span class="line"># lexicon.txt exists.</span><br><span class="line"># and also files silence_phones.txt, nonsilence_phones.txt, optional_silence.txt</span><br><span class="line"># and extra_questions.txt</span><br><span class="line"># Here, silence_phones.txt and nonsilence_phones.txt are lists of silence and</span><br><span class="line"># non-silence phones respectively (where silence includes various kinds of</span><br><span class="line"># noise, laugh, cough, filled pauses etc., and nonsilence phones includes the</span><br><span class="line"># &quot;real&quot; phones.)</span><br><span class="line"># In each line of those files is a list of phones, and the phones on each line</span><br><span class="line"># are assumed to correspond to the same &quot;base phone&quot;, i.e. they will be</span><br><span class="line"># different stress or tone variations of the same basic phone.</span><br><span class="line"># The file &quot;optional_silence.txt&quot; contains just a single phone (typically SIL)</span><br><span class="line"># which is used for optional silence in the lexicon.</span><br><span class="line"># extra_questions.txt might be empty; typically will consist of lists of phones,</span><br><span class="line"># all members of each list with the same stress or tone; and also possibly a</span><br><span class="line"># list for the silence phones.  This will augment the automatically generated</span><br><span class="line"># questions (note: the automatically generated ones will treat all the</span><br><span class="line"># stress/tone versions of a phone the same, so will not &quot;get to ask&quot; about</span><br><span class="line"># stress or tone).</span><br></pre></td></tr></table></figure>
+
+<p>通过阅读脚本和脚本中的注释。可以知道<code>prepare_lang.sh</code>的用法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Usage: utils/prepare_lang.sh &lt;dict-src-dir&gt; &lt;oov-dict-entry&gt; &lt;tmp-dir&gt; &lt;lang-dir&gt;</span><br><span class="line">e.g.: utils/prepare_lang.sh data/local/dict &lt;SPOKEN_NOISE&gt; data/local/lang data/lang</span><br><span class="line">--position-dependent-phones (true|false)        # default: true; if true, use _B, _E, _S &amp; _I</span><br></pre></td></tr></table></figure>
+
+<p><dict-src-dir>是我们在上一部分生成的词典目录。需要包含lexico.txt，extra_questions.txt，nonsilence_phones.txt，optional_silence.txt  silence_phones.txt。<br><code>position_dependent_phones</code>参数为false，导致解码后不能算出单词边界。很多的脚本，特别是评分脚本将不能正常运行。<br>第二个指令将语言模型转换成G.fst格式并保存在data/lang_test_tg 目录下。<br>这个脚本的核心内容是调用了arpa2fst和fstisstochastic，再创建了G.fst之后检查是否有空字符（<s>,</s>之类的）的循环。</dict-src-dir></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arpa2fst --disambig-symbol=#0 --read-symbol-table=$test/words.txt input/task.arpabo $test/G.fst</span><br><span class="line"></span><br><span class="line">fstisstochastic $test/G.fst</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://blog.csdn.net/yutianzuijin/article/details/78756130" target="_blank" rel="noopener">arpa2fst 原理详解</a></p>
+<blockquote>
+<p>arpa文件可以很容易地表示任意n-gram语言模型，不过在实际中n通常等于3、4或者5。arpa文件的每一行表示一个文法项，它通常包含三部分内容：probability word(s) [backoff probability]。probability表示该词或词组发生的概率，word(s)表示具体的词或者词组。backoff probablitiy是可选项，表示回退概率。</p>
+</blockquote>
+<p>在yesno这个toy project中只使用1元的语言模型。对应的arpa文件在<code>input/task.arpabo</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">\data\</span><br><span class="line">ngram 1=4</span><br><span class="line"></span><br><span class="line">\1-grams:</span><br><span class="line">-1	NO</span><br><span class="line">-1	YES</span><br><span class="line">-99 &lt;s&gt;</span><br><span class="line">-1 &lt;/s&gt;</span><br><span class="line"></span><br><span class="line">\end\</span><br></pre></td></tr></table></figure>
+
+<p>fstisstochastic命令则如同其名字的含义一样，用来检查G.fst是否是随机的。<br>在<code>s5/data/lang</code>目录下会出现：</p>
+<ol>
+<li><p><code>phones.txt</code>:将phone转换成数字。其中#0，#1是空字，用来表示句子的开头和结尾。<eps> 是一个特别的含义表示这个弧上没有符号。</eps></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;eps&gt; 0</span><br><span class="line">SIL 1</span><br><span class="line">Y 2</span><br><span class="line">N 3</span><br><span class="line">#0 4</span><br><span class="line">#1 5</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>words.txt</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;eps&gt; 0</span><br><span class="line">&lt;SIL&gt; 1</span><br><span class="line">NO 2</span><br><span class="line">YES 3</span><br><span class="line">#0 4</span><br><span class="line">&lt;s&gt; 5</span><br><span class="line">&lt;/s&gt; 6</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>L_disambig.fst, L.fs</code>t: the dict can be recognized by Kaldi</p>
+</li>
+<li><p><code>topo</code>: phone states transition(HMM)</p>
+</li>
+<li><p><code>oov</code>: out of vocabulary. 仅包含<code>&lt;SIL&gt;</code></p>
+</li>
+<li><p><code>phones</code>: some information about phones</p>
+</li>
+</ol>
+<h2 id="特征提取和训练"><a href="#特征提取和训练" class="headerlink" title="特征提取和训练"></a>特征提取和训练</h2><p>MFCC特征提取和GMM-HMM建模</p>
+<p>提取梅尔倒谱系数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">steps/make_mfcc.sh --nj $num $input_dir $log_dir $output_dir</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://zhuanlan.zhihu.com/p/60371062" target="_blank" rel="noopener">语音信号处理（二）—— MFCC详解</a><br>梅尔倒谱系数是一种非线性的时频表示法，其应用了人耳对低频声音的听觉敏感度更高的原理。</p>
+<p>接着正则化倒谱特征</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">steps/compute_cmvn_stats.sh </span><br><span class="line">utils/fix_data_dir.sh $input_dir</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://placebokkk.github.io/kaldi/2019/08/05/asr-kaldi-feat2.html" target="_blank" rel="noopener">Kaldi中的特征提取(二）- 特征变换</a><br>对训练集和测试集做同样的操作。<br>这里我采用的参数是 $num=1 $output_dir=mfcc<br>那么结果将会保存在mfcc文件夹下。<br>cmvn_test_yesno.ark  cmvn_test_yesno.scp  cmvn_train_yesno.ark  cmvn_train_yesno.scp。<br>ark文件包含特征向量（用cat打开是乱码），scp文件是关系文件，从发音者到ark文件的对应。<br>也可以直接跑脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">num=1 </span><br><span class="line">output_dir=mfcc</span><br><span class="line">for x in train_yesno test_yesno; do</span><br><span class="line">  steps/make_mfcc.sh --nj 1 data/$x exp/make_mfcc/$x mfcc  </span><br><span class="line">  steps/compute_cmvn_stats.sh data/$x exp/make_mfcc/$x mfcc        </span><br><span class="line">  utils/fix_data_dir.sh data/$x </span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<h2 id="单音素模型训练"><a href="#单音素模型训练" class="headerlink" title="单音素模型训练"></a>单音素模型训练</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">steps/train_mono.sh —nj $N —cmd $MAIN_CMD $DATA_DIR $LANG_DIR $OUTPUT_DIR</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：<br>—nj：job的数量，来自同一个speaker的语音不能并行处理。所以在本项目中只能选择为1。<br>—cmd：为了使用本机的资源，调用”utils/run.pl”</p>
+<p>运行脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_cmd=&quot;utils/run.pl&quot; steps/train_mono.sh --nj 1 --cmd &quot;$train_cmd&quot; \   </span><br><span class="line">--totgauss 400 \   </span><br><span class="line">data/train_yesno data/lang exp/mono0a</span><br></pre></td></tr></table></figure>
+
+<p>到现在我们已经完成了模型的训练。</p>
+<h2 id="解码和测试"><a href="#解码和测试" class="headerlink" title="解码和测试"></a>解码和测试</h2><p>接下来用测试集来验证一下模型的准确与否。<br>第一步是创建一个全连接的FST网络。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">utils/mkgraph.sh data/lang_test_tg exp/mono0a exp/mono0a/graph_tgpr</span><br></pre></td></tr></table></figure>
+
+<p>这个指令背后的脚本很长。基本上做的事情是创建以一个HCLG（HMM+Context+Lexicon+Grammer）的解码器并保存在exp/mono0a/graph_tgpr中。<br>还记得我们的每一条语音都是8个连续的Ken或Lo吗(Ken，Lo是希伯来语的yes no）?训练好的模型的工作就是找出这8个词的顺序。<br><code>steps/decode.sh [options] &lt;graph-dir&gt; &lt;data-dir&gt; &lt;decode-dir&gt;</code>用来寻找每一个测试音频的最佳路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">decode_cmd=&quot;utils/run.pl&quot; steps/decode.sh --nj 1 --cmd &quot;$decode_cmd&quot; \</span><br><span class="line">exp/mono0a/graph_tgpr data/test_yesno exp/mono0a/decode_test_yesno</span><br></pre></td></tr></table></figure>
+
+<p>最后是查看结果的环节。<br>在decode.sh内部最后会调用score.sh，这个脚本则生成预测的结果并且计算测试集Word error rate（WER）。<br>调用下列命令可以看到最好的效果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">for x in exp/*/decode*; do [ -d $x ] &amp;&amp; grep WER $x/wer_* | utils/best_wer.sh;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%WER 0.00 [ 0 / 232, 0 ins, 0 del, 0 sub ] exp/mono0a/decode_test_yesno/wer_10_0.0</span><br></pre></td></tr></table></figure>
+
+<p>解读一下结果，花了很长时间才弄懂这些东西是什么意思。<br>WER后跟着的0.00是说字的错误率为0，即准确率为100%。<br>测试集一共29条音频，每条音频有8个字（单音素的字）。一共232个字。<br>参考Stanford的cs224s-17.lec04.pdf</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-dc5c0fcaf24b3750.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WER的计算方法"><br><img src="https://upload-images.jianshu.io/upload_images/4328467-1c85e0672f7772cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt><br>而wer结果文件中的10和0.0分别是lmwt(Language Weight)和wip(word insertion penalty，词插入惩罚)。lmwt用来平衡LM（语言模型）在多大程度上帮助AM（语音模型）<img src="https://upload-images.jianshu.io/upload_images/4328467-3e2341231bb987fa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="LMWT用途 
+https://skemman.is/bitstream/1946/31280/1/msc_anna_vigdis_2018.pdf"><br>至于<a href="https://www.zhihu.com/question/31416764/answer/353868805" target="_blank" rel="noopener">wip</a>：</p>
+<blockquote>
+<p>word insertion penalty, 简写WIP, 是HMM识别匹配过程中用于设置句长的一个参数，可以用来调节生成句子中的单词个数，当前主流的语音识别系统主要采用的都是音素识别，即根据单词的音标而不是单词来进行匹配，这就导致了，在识别过程中，可能很难确定单词的gap，如果让系统自由识别，根据参数初始化的模型来进行匹配的话有可能会生成一些诡异的由长单词构成的句子，或者有很多短单词构成的句子，这些匹配率很低的句子对HMM参数的优化作用很小，同时也很大概率会导致学习速率奇慢或者局部最优解这样的问题，所以通过设置这个参数来得到一些更符合语义结构的生成片段。</p>
+</blockquote>
+<p>最后，我们调用的所有脚本都在run.sh中。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/10/python程序同步webdav网盘（坚果云、owncloud）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -330,6 +565,9 @@
 <p>当时间到达的时候，程序将自动运行。日志会输出到<code>~/test_crontab.log</code>中。</p>
 <p>linux中的定时任务crontab的语法如下:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*  *  *  *  * command</span><br><span class="line">分钟(0-59) 小时(0-23) 每个月的哪一天(1-31) 月份(1-12) 周几(0-6) shell脚本或者命令</span><br></pre></td></tr></table></figure>
+
+<p>对于使用到的网盘，希望能够付费支持一下。</p>
+
           
         
       
@@ -1466,129 +1704,13 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/08/重建博客/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Chen Min">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ChenMin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/08/重建博客/" itemprop="url">重建博客</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-08T21:51:25+08:00">
-                2019-09-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>2019年4月的时候用hexo和github page创建过一个博客，但是在更换电脑的时候意外丢失了模版。后又恢复回来，只剩下了网页，，没有网站配置和md原始文件。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
 
 
           </div>
@@ -1632,7 +1754,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -1645,7 +1767,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
