@@ -229,6 +229,216 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/01/Kaldi入门-二-AiShell-上/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/05/01/Kaldi入门-二-AiShell-上/" itemprop="url">Kaldi入门(二):AiShell(上)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-01T17:50:10+08:00">
+                2020-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这篇文章是学习Kaldi的第二篇。对应SUSTech CS310课程的Lab6和Lab7。<br>第一篇里探索了如何对toy language（仅包含两个单音素单词）进行语言模型的建模。至于训练和解码的部分，时间条件和理解能力暂时不允许去整理。<br>本篇文章的主要目标是理解复杂的中文多音素语言模型和使用AiShell语料集来真实的训练出一个可用的中文语音识别模型。完整的AiShell例子包含GMM-HMM和神经网络。Lab6先展示了GMM-HMM后的结果。Lab7则补充了神经网络。</p>
+<h2 id="AiShell描述和下载"><a href="#AiShell描述和下载" class="headerlink" title="AiShell描述和下载"></a>AiShell描述和下载</h2><p>AiShell 是 希尔贝壳公司开源的中文普通话语料集。400个来自不同方言区的人参与录制， 录制的条件是在室内使用高保真的麦克风，音频降采样到16000Hz。中文文字脚本95%的准确度。170小时的语料。划分为85%的训练集，10%的开发集（作用？），5%的测试集。在上课的时候我被录制语料的成本吓到了，2000小时的语料大约需要100万人民币的费用。AiShell语料集可以免费用于学术目的。</p>
+<p>Kaldi中包含Aishell的示例脚本。在<code>kaldi/egs/aishell/s5</code>中。下文所有的文件都在该目录之下。<br>下载语料集的脚本包含在<code>run.sh</code>中。<br>先安装好语言模型的工具才能运行<code>run.sh</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run ./install_kaldi_lm.sh &amp;&amp; source ../env.sh</span><br></pre></td></tr></table></figure>
+
+<p>上一篇文章没有说每一个项目下的s5文件夹中有什么，在网上找到了别人写的一个总结：<a href="https://www.jianshu.com/p/6ab663601da8" target="_blank" rel="noopener">kaldi 源码分析(三) - run.pl 分析</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cmd.sh                     # 并行执行命令，通常分 run.pl, queue.pl 两种</span><br><span class="line">config                       # 参数定制化配置文件， mfcc, decode, cmvn 等配置文件</span><br><span class="line">local                         # 工程定制化内容</span><br><span class="line">path.sh                    # 环境变量相关脚本</span><br><span class="line">run.sh                      # 整体流程控制脚本，主入口脚本</span><br><span class="line">steps                       # 存放单一步骤执行的脚本</span><br><span class="line">utils                         # 存放解析文件，预处理等相</span><br><span class="line">关工具的脚本</span><br></pre></td></tr></table></figure>
+
+<p>最重要的入口脚本是run.sh。包含所有脚本。如果要在本地运行，需要修改这个脚本。把其中的<code>queue.pl</code>改成<code>run.pl</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export train_cmd=&quot;run.pl&quot; </span><br><span class="line">export decode_cmd=run.pl </span><br><span class="line">export mkgraph_cmd=&quot;run.pl&quot;</span><br></pre></td></tr></table></figure>
+
+<p>先做Lab6，注释掉神经网络训练部分。为了对比加不加神经网络对最后的识别准确率有多大的影响。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># nnet3</span><br><span class="line">#local/nnet3/run_tdnn.sh</span><br><span class="line"># chain</span><br><span class="line">#local/chain/run_tdnn.sh</span><br></pre></td></tr></table></figure>
+
+<h2 id="运行run-sh脚本，一步到位"><a href="#运行run-sh脚本，一步到位" class="headerlink" title="运行run.sh脚本，一步到位"></a>运行run.sh脚本，一步到位</h2><p>在上一篇文章中，主要讲了kaldi的工作流程，复杂一点的项目除了要考虑多音素的对齐以外？基本流程是差不多的。先运行整体流程脚本run.sh看一下效果。然后再具体深入进脚本中看有哪些关键步骤。</p>
+<p>你是否遇到过连接远程服务器跑训练，然后网络掉线杀掉了正在跑的进程？我遇到过，后来主要使用nohup来避免这个问题。课件里推荐使用screen来避免远程登陆进程被杀掉后，训练进程也停止的问题。screen的原理不是本篇文章关心的重点。<br>加上screen后运行run.sh：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">screen -S run</span><br><span class="line">run ./run.sh</span><br></pre></td></tr></table></figure>
+
+<p>就能看到脚本在一个新的页面输出内容了。<br>如果要结束进程<code>ctrl a + d</code>//我其实不喜欢这个命令，因为很经常使用ctrl+a来编辑命令，两个快捷键冲突。</p>
+<h2 id="查看结果"><a href="#查看结果" class="headerlink" title="查看结果"></a>查看结果</h2><p>中文语音识别的准确度通常使用CER（Char Error Rate）来表示。因为中文中字是最小语义单位，而英文中词是基本语义单位。<br>和上一篇文章差不多的命令。脚本的运行结果保存在了exp目录下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for x in exp/*/decode_test; do [ -d $x ] &amp;&amp; grep WER $x/cer_* | utils/best_wer.sh; done 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<p>训练出来的结果如下：<br><img src="https://upload-images.jianshu.io/upload_images/4328467-1d97f79d32a17c9d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="训练结果"></p>
+<p>可以<code>cat RESULTS</code>，和官方跑出来的结果做一下对比。<br><img src="https://upload-images.jianshu.io/upload_images/4328467-9e126dc0a774d7e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RESULTS"><br>需要注意的是，和上篇文章的实验不一样的是，输出的结果是多行的，因为执行了多次的实验，上面的脚本输出的是每次实验最好的结果。<br>我自己跑出来的最好结果是tri5a的cer_14_0.5而RESULTS中的GMM-HMM模型中最好的结果是tri5a的cer_13_0.5。两者CER都是12.12。每次实验本身都有一定的随机性。结果有一些误差是没问题的。为了确认模型有被正确的训练，查看自己结果的<code>tri5a/decode_test/cer_13_0.5</code>的CER是12.18，恰好不是最优解而已。这里的13和14是lmwt（语言模型权重）。具体的可以看上一篇文章。<br><img src="https://upload-images.jianshu.io/upload_images/4328467-c66a0fed697e4d4e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="cer_13_0.5"></p>
+<h2 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h2><p>使用命令<code>cat run.sh | grep &quot;#&quot;</code>将run.sh脚本中的环节注释提取打印出来。其中倒数2，4行是我们在一开始注释掉的。可以看到基本可以分为准备、训练和获取结果三个部分。<br><img src="https://upload-images.jianshu.io/upload_images/4328467-abf575a7096c5532.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="run.sh注释部分"></p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><ol>
+<li>下载语料集<br>需要注意的是aishell语料集有大概20GB的大小。意味着需要很长的时间才能下载下来。我是直接用服务器里提前下好的语料集。<br><img src="https://upload-images.jianshu.io/upload_images/4328467-61ddf46d7f32ab25.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="aishell目录概览"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/download_and_untar.sh $data $data_url data_aishell || exit 1;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>这里的 <code>a || b</code>是一个逻辑符号，代表着如果a执行失败则执行b。这里要放一个小插曲。去年面试阿里云的实习项目时，面试官开头就问了如何知道上一条linux命令是否成功执行。我当时不知道，现在要知道了。就是看变量<code>$?</code>的值，如果为0代表成功执行。这里的<code>exit 1</code>终止当前进程并且将<code>$?</code>设置为1。表示不成功执行。<br><code>$data</code> 是aishell在本机的位置，既可以新建一个空目录来下载，也可以指定到已经下好的路径，aishell 分为<code>resource_aishell</code>和<code>data_aishell</code>两部分来下载，脚本会通过检查每一个部分下是否有<code>.complete</code>文件来判断当前部分是否下载完全。如果没有才会到指定网址下载。</p>
+<ol start="2">
+<li>Lexicon Preparation<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/aishell_prepare_dict.sh $data/resource_aishell || exit 1;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>这个脚本的功能主要是将<code>resource_aishell</code>下的<code>lexicon.txt</code>复制到<code>data/local/dict</code>中。并且提取出<code>nonsilence_phones.txt</code>、<code>optional_silence.txt</code>、<code>silence_phones.txt</code>和<code>extra_questions.txt</code>。用到了很多awk和perl的脚本。没看懂。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-83063cfebc09aa40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="lexicon.txt"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-a3a4627506e1625c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="提取extra_questions.txt的代码"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-7a4adb98d33170fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="extra_questions.txt部分内容"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-5fec7d4dd70defd3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="提取nonsilence_phones.txt代码"><br>每行代表一组相同的base phone,包含各种不同的重音或者声调。<br><img src="https://upload-images.jianshu.io/upload_images/4328467-910cf3e3056dac3d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="nonsilence_phones.txt部分内容"></p>
+<ol start="3">
+<li>Data preparation<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/aishell_data_prep.sh $data/data_aishell/wav $data/data_aishell/transcript || exit 1;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p><code>$data/data_aishell/wav</code>目录下放着的是音频文件。其中有两级目录<code>speaker/filename.wav</code>。<br><code>$data/data_aishell/transcript</code>目录下放着的是<code>aishell_transcript_v0.8.txt</code>文字翻录。<br>这个shell脚本的功能是将<code>$data/data_aishell/wav</code>下的 <code>train</code>,<code>test</code>,<code>dev</code>分别建立索引。并且建立Kaldi能够理解的语料格式。具体有些什么可以参考上一篇文章和下面这一段脚本。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># Transcriptions preparation</span><br><span class="line">for dir in $train_dir $dev_dir $test_dir; do</span><br><span class="line">  echo Preparing $dir transcriptions</span><br><span class="line">  # 将当前集合目录下的wav的文件名提取出来作为utt_id</span><br><span class="line">  sed -e &apos;s/\.wav//&apos; $dir/wav.flist | awk -F &apos;/&apos; &apos;&#123;print $NF&#125;&apos; &gt; $dir/utt.list</span><br><span class="line">  # 根据目录结构建立utt2spk的关系</span><br><span class="line">  sed -e &apos;s/\.wav//&apos; $dir/wav.flist | awk -F &apos;/&apos; &apos;&#123;i=NF-1;printf(&quot;%s %s\n&quot;,$NF,$i)&#125;&apos; &gt; $dir/utt2spk_all</span><br><span class="line">  # 按列合并utt.list和wav.flist，达到对音频文件的映射。</span><br><span class="line">  paste -d&apos; &apos; $dir/utt.list $dir/wav.flist &gt; $dir/wav.scp_all</span><br><span class="line">  utils/filter_scp.pl -f 1 $dir/utt.list $aishell_text &gt; $dir/transcripts.txt</span><br><span class="line">  awk &apos;&#123;print $1&#125;&apos; $dir/transcripts.txt &gt; $dir/utt.list</span><br><span class="line">  utils/filter_scp.pl -f 1 $dir/utt.list $dir/utt2spk_all | sort -u &gt; $dir/utt2spk</span><br><span class="line">  utils/filter_scp.pl -f 1 $dir/utt.list $dir/wav.scp_all | sort -u &gt; $dir/wav.scp</span><br><span class="line">  sort -u $dir/transcripts.txt &gt; $dir/text</span><br><span class="line">  utils/utt2spk_to_spk2utt.pl $dir/utt2spk &gt; $dir/spk2utt</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-Phone-sets-questions-L-compilation"><a href="#4-Phone-sets-questions-L-compilation" class="headerlink" title="4. Phone sets, questions, L compilation"></a>4. Phone sets, questions, L compilation</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">utils/prepare_lang.sh --position-dependent-phones false data/local/dict \</span><br><span class="line">    &quot;&lt;SPOKEN_NOISE&gt;&quot; data/local/lang data/lang || exit 1;</span><br></pre></td></tr></table></figure>
+
+<p>上面shell脚本的目的是创建L.fst，音素模型，其中fst是Finite State Transducers（有限状态转换器）的缩写。找到这篇<a href="https://blog.csdn.net/DuishengChen/article/details/52473918" target="_blank" rel="noopener">Kaldi学习笔记 – 构建字典FST脚本 – prepare_lang.sh 关键内容解析</a>详细的说明了这个脚本的工作。而<a href="https://blog.csdn.net/mengjianmuzi/article/details/99499343" target="_blank" rel="noopener">关于prepare_lang的一点理解</a>给脚本进行了一些翻译和注释。</p>
+<blockquote>
+<p><a href="https://www.jianshu.com/p/4ad2add56b25" target="_blank" rel="noopener">Kaldi中FST(Finite State Transducer)含义及其可视化</a><br>L.fst: 音素词典（Phonetic Dictionary or Lexicon）模型，phone symbols作为输入，word symbols作为输出，如图Figure 1所示。<br><img src="https://upload-images.jianshu.io/upload_images/4328467-4d7db0ea1fea45fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Figure 1 L.fst结构"><br>L_disambig.fst是为了消除模棱两可（disambiguation）而引入的模型，表述为 the lexicon with disambiguation symbols。分歧的情况如：一个词是另一个词的前缀，cat 和 cats在同一个词典中，则需要”k ae t #1”； 有同音的词，red: “r eh d #1”, read: “r eh d #2”。</p>
+</blockquote>
+<p>我一直疑惑<code>lexiconp.txt</code>是怎么生成的，查了好久。结果竟然只是一段在词和音素之间插入1.0的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if [[ ! -f $srcdir/lexiconp.txt ]]; then</span><br><span class="line">  echo &quot;**Creating $srcdir/lexiconp.txt from $srcdir/lexicon.txt&quot;</span><br><span class="line">  perl -ape &apos;s/(\S+\s+)(.+)/$&#123;1&#125;1.0\t$2/;&apos; &lt; $srcdir/lexicon.txt &gt; $srcdir/lexiconp.txt || exit 1;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/4328467-03d9e641c2b5062c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="lexiconp.txt"><br>那么L.fst是怎么得到的呢？<br>通过<code>make_lexicon_fst.py</code>（现有的博客都说是.pl结尾，可能kaldi重构了）。还有一个消歧义的过程。具体的就看不懂了。<a href="https://shiweipku.gitbooks.io/chinese-doc-of-kaldi/content/decoding_graph_test.html" target="_blank" rel="noopener">解码图创建示例（测试阶段）</a>里有较为详细的文档讲解。</p>
+<h4 id="5-LM-training"><a href="#5-LM-training" class="headerlink" title="5. LM training"></a>5. LM training</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/aishell_train_lms.sh || exit 1;</span><br></pre></td></tr></table></figure>
+
+<p>这个shell脚本读取<code>data/local/train/text</code>,<code>data/local/dict/lexicon.txt</code><br>得到text的计数文件<code>word.counts</code>并以<code>word.counts</code>为基础添加<code>lexicon.txt</code>中的字（除了SIL）出现的次数到<code>unigram.counts</code>中。我就没深入看下去了，期间用到的脚本文件有:<code>get_word_map.pl</code>、<code>train_lm.sh --arpa --lmtype 3gram-mincount $dir || exit 1</code>;这个步骤的结果保存在<code>data/local/lm/3gram-mincount/lm_unpruned.gz</code>中。</p>
+<h4 id="6-G-compilation-check-LG-composition"><a href="#6-G-compilation-check-LG-composition" class="headerlink" title="6. G compilation, check LG composition"></a>6. G compilation, check LG composition</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">utils/format_lm.sh data/lang data/local/lm/3gram-mincount/lm_unpruned.gz \</span><br><span class="line">    data/local/dict/lexicon.txt data/lang_test || exit 1;</span><br></pre></td></tr></table></figure>
+
+<p>这个步骤是编译G.fst并将LG串联起来。</p>
+<blockquote>
+<p><a href="https://www.jianshu.com/p/4ad2add56b25" target="_blank" rel="noopener">Kaldi中FST(Finite State Transducer)含义及其可视化</a><br>G.fst: 语言模型，大部分是FSA（finite state acceptor, i.e. 每个arc的输入输出是相同的），如图Figure 2所示。<br><img src="//upload-images.jianshu.io/upload_images/9776212-21d8881fe6b03048.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/174/format/webp" alt="Figure 2 G.fst结构（由指令词识别1-gram语法产生，disambiguation symbol #0 未加入）
+"></p>
+</blockquote>
+<blockquote>
+<p><a href="https://hupeng.me/articles/25.html" target="_blank" rel="noopener">kaldi 训练 aishell 解析</a><br>utils/format_lm.sh:上述的语言工具基于第三方工具，为ARPA-format,脚本的作业是将其转换为fst，方便与之前的字典fst(L.fst)结合，发挥fst的优势。脚本最后会检测G.fst中是否存在没有单词的空回环，如果存在会报错，因为这会导致后续HLG determinization的出现错误。<br>脚本utils/format_lm.sh解决把ARPA格式的语言模型转换成OpenFST格式类型。脚本用法如下：<br>Usage: utils/format_lm.sh <lang_dir> <arpa-lm> <lexicon> <out_dir><br>E.g.: utils/format_lm.sh data/lang data/local/lm/foo.kn.gz data/local/dict/lexicon.txt data/lang_test<br>Convert ARPA-format language models to FSTs.<br>这个脚本的一些关键命令如下：<br>gunzip -c $lm <br>| arpa2fst –disambig-symbol=#0 <br>      –read-symbol-table=$out_dir/words.txt - $out_dir/G.fst<br>Kaldi程序arpa2fst将ARPA格式的语言模型转换成一个加权有限状态转移机（实际上是接收机）。</out_dir></lexicon></arpa-lm></lang_dir></p>
+</blockquote>
+<p>流程很复杂，未来可能再把L.fst，LM training，G.fst， LG composition另起一篇。（就是说现在时间条件不允许深入）</p>
+<h3 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h3><p>训练的环节开始我就读不懂了。主要是逻辑和概念不懂。也不浪费时间了。简单的去了解一下输入输出和功能。</p>
+<h4 id="1-MFCC-特征生成"><a href="#1-MFCC-特征生成" class="headerlink" title="1. MFCC 特征生成"></a>1. MFCC 特征生成</h4><p>这个环节和yesno项目的没有不同。主要就是获得train,test, dev三个集合的归一化的梅尔倒谱系数。最后修复排序错误，并会移除那些被指明需要特征数据或标注，但是却找不到被需要的数据的那些发音（utterances）。</p>
+<h4 id="2-训练单音素模型"><a href="#2-训练单音素模型" class="headerlink" title="2. 训练单音素模型"></a>2. 训练单音素模型</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">steps/train_mono.sh --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/mono || exit 1;</span><br></pre></td></tr></table></figure>
+
+<p>参考<a href="https://zhuanlan.zhihu.com/p/82380716" target="_blank" rel="noopener">kaldi-GMM-HMM pipeline</a>，上面的shell脚本主要是对齐音素和每一帧音频的。<a href="https://blog.csdn.net/DanyHgc/article/details/75247158" target="_blank" rel="noopener">Kaldi 入门train_mono.sh详解</a>、<a href="https://blog.csdn.net/DuishengChen/article/details/52575926" target="_blank" rel="noopener">kaldi学习笔记 – 训练单音素（monophone）模型脚本 – steps/train_mono.sh</a>都有讲一些。<br>对流程讲得最好的是：<br>mkgraph 需要 lang_test 下的 L.fst G.fst phones.txt, words.txt , phones/silence.csl , phones/<a href="https://link.zhihu.com/?target=http%3A//disambig.int" target="_blank" rel="noopener">http://disambig.int</a></p>
+<p>以及 exp/tri 下的 tree, final.mdl</p>
+<blockquote>
+<p>在训练的job并行训练过程中，训练数据的各个子集合是分散到不同的处理器去进行训练，然后每轮迭代后会进行合并。<br>下面就讲一下训练的过程：<br>1.首先是初始化GMM，使用的脚本是/kaldi-trunk/src/gmmbin/gmm-init-mono，输出是0.mdl和tree文件；<br>2.compile training graphs,使用的脚本是/kaldi-trunk/source/bin/compile-training-graphs，输入是tree,0.mdl和L.fst,输出是fits.JOB.gz，其是在训练过程中构建graph的过程；<br>3.接下来是一个对齐的操作，kaldi-trunk/source/bin/align-equal-compiled；<br>4.然后是基于GMM的声学模型进行最大似然估计得过程，脚本为/kaldi-trunk/src/gmmbin/gmm-est；<br>5.然后进行迭代循环中进行操作，如果本步骤到了对齐的步骤，则调用脚本kaldi-kaldi/src/gmmbin/gmm-align-compiled；<br>6.重新估计GMM，累计状态，用脚本/kaldi-trunk/src/gmmbin/gmm-acc-states-ali；调用新生成的参数(高斯数)重新估计GMM，调用脚本/kaldi-trunk/src/gmmbin/gmm-est；<br>7.对分散在不同处理器上的结果进行合并，生成.mdl结果，调用脚本gmm-acc-sum；<br>8.增加高斯数，如果没有超过设定的迭代次数，则跳转到步骤5重新进行训练<br>最后生成的.mdl即为声学模型文件<br>在离线识别阶段，即可以调用utils/mkgraph.sh；来对刚刚生成的声学文件进行构图<br>之后解码，得到离线测试的识别率。</p>
+</blockquote>
+<h4 id="3-Monophone-decoding-单音素解码"><a href="#3-Monophone-decoding-单音素解码" class="headerlink" title="3. (Monophone decoding) 单音素解码"></a>3. (Monophone decoding) 单音素解码</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">utils/mkgraph.sh data/lang_test exp/mono exp/mono/graph || exit 1;</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --config conf/decode.config --nj 10 \</span><br><span class="line">  exp/mono/graph data/dev exp/mono/decode_dev</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --config conf/decode.config --nj 10 \</span><br><span class="line">  exp/mono/graph data/test exp/mono/decode_test</span><br></pre></td></tr></table></figure>
+
+<p><code>mkgraph.sh</code>将L_disambig.fst 和 G.fst 复合生成LG.fst。中间经历了我看不懂的处理。最终生成用于解码的 HCLG.fst。</p>
+<h4 id="看不懂的部分"><a href="#看不懂的部分" class="headerlink" title="看不懂的部分"></a>看不懂的部分</h4><p>后面就已经看不懂了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"># Get alignments from monophone system.</span><br><span class="line">steps/align_si.sh --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/mono exp/mono_ali || exit 1;</span><br><span class="line"></span><br><span class="line"># train tri1 [first triphone pass]</span><br><span class="line">steps/train_deltas.sh --cmd &quot;$train_cmd&quot; \</span><br><span class="line"> 2500 20000 data/train data/lang exp/mono_ali exp/tri1 || exit 1;</span><br><span class="line"></span><br><span class="line"># decode tri1</span><br><span class="line">utils/mkgraph.sh data/lang_test exp/tri1 exp/tri1/graph || exit 1;</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --config conf/decode.config --nj 10 \</span><br><span class="line">  exp/tri1/graph data/dev exp/tri1/decode_dev</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --config conf/decode.config --nj 10 \</span><br><span class="line">  exp/tri1/graph data/test exp/tri1/decode_test</span><br><span class="line"></span><br><span class="line"># align tri1</span><br><span class="line">steps/align_si.sh --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/tri1 exp/tri1_ali || exit 1;</span><br><span class="line"></span><br><span class="line"># train tri2 [delta+delta-deltas]</span><br><span class="line">steps/train_deltas.sh --cmd &quot;$train_cmd&quot; \</span><br><span class="line"> 2500 20000 data/train data/lang exp/tri1_ali exp/tri2 || exit 1;</span><br><span class="line"></span><br><span class="line"># decode tri2</span><br><span class="line">utils/mkgraph.sh data/lang_test exp/tri2 exp/tri2/graph</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --config conf/decode.config --nj 10 \</span><br><span class="line">  exp/tri2/graph data/dev exp/tri2/decode_dev</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --config conf/decode.config --nj 10 \</span><br><span class="line">  exp/tri2/graph data/test exp/tri2/decode_test</span><br><span class="line"></span><br><span class="line"># train and decode tri2b [LDA+MLLT]</span><br><span class="line">steps/align_si.sh --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/tri2 exp/tri2_ali || exit 1;</span><br><span class="line"></span><br><span class="line"># Train tri3a, which is LDA+MLLT,</span><br><span class="line">steps/train_lda_mllt.sh --cmd &quot;$train_cmd&quot; \</span><br><span class="line"> 2500 20000 data/train data/lang exp/tri2_ali exp/tri3a || exit 1;</span><br><span class="line"></span><br><span class="line">utils/mkgraph.sh data/lang_test exp/tri3a exp/tri3a/graph || exit 1;</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --nj 10 --config conf/decode.config \</span><br><span class="line">  exp/tri3a/graph data/dev exp/tri3a/decode_dev</span><br><span class="line">steps/decode.sh --cmd &quot;$decode_cmd&quot; --nj 10 --config conf/decode.config \</span><br><span class="line">  exp/tri3a/graph data/test exp/tri3a/decode_test</span><br><span class="line"></span><br><span class="line"># From now, we start building a more serious system (with SAT), and we&apos;ll</span><br><span class="line"># do the alignment with fMLLR.</span><br><span class="line"></span><br><span class="line">steps/align_fmllr.sh --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/tri3a exp/tri3a_ali || exit 1;</span><br><span class="line"></span><br><span class="line">steps/train_sat.sh --cmd &quot;$train_cmd&quot; \</span><br><span class="line">  2500 20000 data/train data/lang exp/tri3a_ali exp/tri4a || exit 1;</span><br><span class="line"></span><br><span class="line">utils/mkgraph.sh data/lang_test exp/tri4a exp/tri4a/graph</span><br><span class="line">steps/decode_fmllr.sh --cmd &quot;$decode_cmd&quot; --nj 10 --config conf/decode.config \</span><br><span class="line">  exp/tri4a/graph data/dev exp/tri4a/decode_dev</span><br><span class="line">steps/decode_fmllr.sh --cmd &quot;$decode_cmd&quot; --nj 10 --config conf/decode.config \</span><br><span class="line">  exp/tri4a/graph data/test exp/tri4a/decode_test</span><br><span class="line"></span><br><span class="line">steps/align_fmllr.sh  --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/tri4a exp/tri4a_ali</span><br><span class="line"></span><br><span class="line"># Building a larger SAT system.</span><br><span class="line"></span><br><span class="line">steps/train_sat.sh --cmd &quot;$train_cmd&quot; \</span><br><span class="line">  3500 100000 data/train data/lang exp/tri4a_ali exp/tri5a || exit 1;</span><br><span class="line"></span><br><span class="line">utils/mkgraph.sh data/lang_test exp/tri5a exp/tri5a/graph || exit 1;</span><br><span class="line">steps/decode_fmllr.sh --cmd &quot;$decode_cmd&quot; --nj 10 --config conf/decode.config \</span><br><span class="line">   exp/tri5a/graph data/dev exp/tri5a/decode_dev || exit 1;</span><br><span class="line">steps/decode_fmllr.sh --cmd &quot;$decode_cmd&quot; --nj 10 --config conf/decode.config \</span><br><span class="line">   exp/tri5a/graph data/test exp/tri5a/decode_test || exit 1;</span><br><span class="line"></span><br><span class="line">steps/align_fmllr.sh --cmd &quot;$train_cmd&quot; --nj 10 \</span><br><span class="line">  data/train data/lang exp/tri5a exp/tri5a_ali || exit 1;</span><br><span class="line"></span><br><span class="line"># nnet3</span><br><span class="line">local/nnet3/run_tdnn.sh</span><br><span class="line"></span><br><span class="line"># chain</span><br><span class="line">local/chain/run_tdnn.sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取结果"><a href="#获取结果" class="headerlink" title="获取结果"></a>获取结果</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># getting results (see RESULTS file)</span><br><span class="line">for x in exp/*/decode_test; do [ -d $x ] &amp;&amp; grep WER $x/cer_* | utils/best_wer.sh; done 2&gt;/dev/null</span><br><span class="line">for x in exp/*/*/decode_test; do [ -d $x ] &amp;&amp; grep WER $x/cer_* | utils/best_wer.sh; done 2&gt;/dev/null</span><br><span class="line">exit 0;</span><br></pre></td></tr></table></figure>
+
+<p>和上一篇文章一样的步骤。<br><a href="https://www.jianshu.com/p/09deba57f339" target="_blank" rel="noopener">Kaldi入门：yesno项目</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/01/Kaldi入门-一-yesno项目/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1585,125 +1795,6 @@ https://skemman.is/bitstream/1946/31280/1/msc_anna_vigdis_2018.pdf"><br>至于<a
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/09/软件测试week1-note/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Chen Min">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ChenMin's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/09/09/软件测试week1-note/" itemprop="url">软件测试week1 note</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-09T15:23:33+08:00">
-                2019-09-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1754,7 +1845,7 @@ https://skemman.is/bitstream/1946/31280/1/msc_anna_vigdis_2018.pdf"><br>至于<a
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
