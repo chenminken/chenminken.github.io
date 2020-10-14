@@ -48,10 +48,39 @@
       </tags>
   </entry>
   <entry>
-    <title>hexo博客样式更改尝试</title>
-    <url>/2020/10/14/hexo%E5%8D%9A%E5%AE%A2%E6%A0%B7%E5%BC%8F%E6%9B%B4%E6%94%B9%E5%B0%9D%E8%AF%95/</url>
-    <content><![CDATA[<p>c</p>
+    <title>如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)</title>
+    <url>/2019/09/23/%E5%A6%82%E4%BD%95%E6%B5%8B%E8%AF%95%E9%82%A3%E4%BA%9B%E9%9A%BE%E4%BB%A5%E6%B5%8B%E8%AF%95%E7%9A%84%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<h2 id="如何测试标准输出中的内容"><a href="#如何测试标准输出中的内容" class="headerlink" title="如何测试标准输出中的内容"></a>如何测试标准输出中的内容</h2><p>标准输出：<code>System.out.println()</code></p>
+<p>方法流程：</p>
+<ol>
+<li>使用<code>OutputStream, System.setOut</code>重定向输出流</li>
+<li>使用<code>System.getProperty(&quot;line.separator)</code>来正确的测试下一行</li>
+<li>使用<code>System.setOut, System.out</code>恢复输出流</li>
+</ol>
+<hr>
+<h3 id="样例代码"><a href="#样例代码" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// PrintClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"Just follow your heard"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrintClassTest.java,忽略掉import的部分</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClassTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrintSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 重定向标准输出到指定printstream中</span></span><br><span class="line">		OutputStream os = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">		PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">		System.setOut(ps);</span><br><span class="line">		<span class="comment">// 执行测试代码</span></span><br><span class="line">		PrintClass pc = <span class="keyword">new</span> PrintClass();</span><br><span class="line">		pc.printSome();</span><br><span class="line">		assertEquals(<span class="string">"Just follow your heard"</span></span><br><span class="line">						+ System.getProperty(<span class="string">"line.separator"</span>),</span><br><span class="line">                os.toString());</span><br><span class="line">		<span class="comment">// 恢复重定向</span></span><br><span class="line">		PrintStream originalOut = System.out;</span><br><span class="line">    	System.setOut(originalOut);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/printtest" target="_blank" rel="noopener">week2:printtest</a></p>
+<h2 id="如何测试私有方法"><a href="#如何测试私有方法" class="headerlink" title="如何测试私有方法"></a>如何测试私有方法</h2><p>Java中的私有方法不能通过obj.method()的方式来调用。如果需要测试私有方法怎么办？</p>
+<p>使用反射机制获取这个私有方法。</p>
+<p>需要使用到的方法<code>Class.getDeclaredMethod(), Method.setAccessible(), Method.invoke()</code></p>
+<p>方法流程：</p>
+<ol>
+<li>获取需要测试类的class对象（可以使用class.forname的方法，也可以直接使用[ClassName].class的方法）</li>
+<li>获取该class对象指定的私有方法的Method对象（<code>[classobj.class].getDeclaredMethod(String name, Class&lt;?&gt;... parameterTypes)</code>）</li>
+<li>修改私有方法的访问性为公开访问(<code>[MethodObj].setAccessible(true)</code>。</li>
+<li>实例化需要测试类的object对象(<code>[ClassName.class].newInstance()</code>)</li>
+<li>调用该私有方法测试(<code>[MethodObj].invoke([objectInstance], ...)</code>)</li>
+</ol>
+<hr>
+<h3 id="样例代码-1"><a href="#样例代码-1" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// PrivateMethodClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">privatePlus</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> a + b;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrivateMethodClassTest.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClassTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrivatePlus1</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException </span>&#123;</span><br><span class="line">        Class cls = Class.forName(<span class="string">"PrivateMethodClass"</span>);</span><br><span class="line">        Method msd = cls.getDeclaredMethod(<span class="string">"privatePlus"</span>, <span class="keyword">int</span>.class, <span class="keyword">int</span>.class);</span><br><span class="line">        msd.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        Object obj = cls.newInstance();</span><br><span class="line">        <span class="keyword">int</span> res = (Integer)msd.invoke(obj, <span class="number">4</span>,<span class="number">6</span>);</span><br><span class="line">        assertEquals(<span class="number">10</span>, res);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/privateTest" target="_blank" rel="noopener">week2:privateTest</a></p>
 ]]></content>
+      <tags>
+        <tag>软件测试</tag>
+        <tag>Java</tag>
+      </tags>
   </entry>
   <entry>
     <title>python程序同步webdav网盘（坚果云、owncloud)</title>
@@ -91,39 +120,48 @@
 ]]></content>
   </entry>
   <entry>
-    <title>如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)</title>
-    <url>/2019/09/23/%E5%A6%82%E4%BD%95%E6%B5%8B%E8%AF%95%E9%82%A3%E4%BA%9B%E9%9A%BE%E4%BB%A5%E6%B5%8B%E8%AF%95%E7%9A%84%E6%96%B9%E6%B3%95/</url>
-    <content><![CDATA[<h2 id="如何测试标准输出中的内容"><a href="#如何测试标准输出中的内容" class="headerlink" title="如何测试标准输出中的内容"></a>如何测试标准输出中的内容</h2><p>标准输出：<code>System.out.println()</code></p>
-<p>方法流程：</p>
-<ol>
-<li>使用<code>OutputStream, System.setOut</code>重定向输出流</li>
-<li>使用<code>System.getProperty(&quot;line.separator)</code>来正确的测试下一行</li>
-<li>使用<code>System.setOut, System.out</code>恢复输出流</li>
+    <title>用python写一个过滤器</title>
+    <url>/2019/09/27/%E7%94%A8python%E5%86%99%E4%B8%80%E4%B8%AA%E8%BF%87%E6%BB%A4%E5%99%A8/</url>
+    <content><![CDATA[<p>计算机视觉课Assigment2的内容.</p>
+<p>要求写出一个图像的过滤器出来。</p>
+<h2 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h2><p><strong>Image Filtering.</strong>Image filtering (or convolution) is a fundamental image processing tool. You will be writing your own function to implement image filtering from scratch. More specifically, you will implement my_imfilter()which imitates the filter2Dfunction in the OpenCV library. As specified in student_code.py, your filtering algorithm must</p>
+<p>(1) support grayscale and color images</p>
+<p>(2) support arbitrary shaped filters, as long as both dimensions are odd</p>
+<p>(e.g. 7x9 filters but not 4x5 filters)</p>
+<p>(3) pad the input image with zeros or reflected image content</p>
+<p>(4) return a filtered image which is the same resolution as the input image.</p>
+<p>使用numpy，PIL。</p>
+<h2 id="步骤："><a href="#步骤：" class="headerlink" title="步骤："></a>步骤：</h2><ol>
+<li>导入图像（不属于本次任务）</li>
+<li>生成过滤核（不属于本次任务）</li>
+<li>padding</li>
+<li>calculate</li>
+<li>normalization（不属于本次任务，即假设过滤核和图像已经做好了正则化）</li>
+<li>截断</li>
 </ol>
 <hr>
-<h3 id="样例代码"><a href="#样例代码" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// PrintClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"Just follow your heard"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrintClassTest.java,忽略掉import的部分</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClassTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrintSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 重定向标准输出到指定printstream中</span></span><br><span class="line">		OutputStream os = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">		PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">		System.setOut(ps);</span><br><span class="line">		<span class="comment">// 执行测试代码</span></span><br><span class="line">		PrintClass pc = <span class="keyword">new</span> PrintClass();</span><br><span class="line">		pc.printSome();</span><br><span class="line">		assertEquals(<span class="string">"Just follow your heard"</span></span><br><span class="line">						+ System.getProperty(<span class="string">"line.separator"</span>),</span><br><span class="line">                os.toString());</span><br><span class="line">		<span class="comment">// 恢复重定向</span></span><br><span class="line">		PrintStream originalOut = System.out;</span><br><span class="line">    	System.setOut(originalOut);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="函数定义"><a href="#函数定义" class="headerlink" title="函数定义"></a>函数定义</h2><p>图像过滤器的核心是一个function，函数的定义</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_imfilter</span><span class="params">(image, filter)</span></span></span><br><span class="line"><span class="function">	<span class="title">return</span> <span class="title">filtered_image</span></span></span><br></pre></td></tr></table></figure>
 
-<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/printtest" target="_blank" rel="noopener">week2:printtest</a></p>
-<h2 id="如何测试私有方法"><a href="#如何测试私有方法" class="headerlink" title="如何测试私有方法"></a>如何测试私有方法</h2><p>Java中的私有方法不能通过obj.method()的方式来调用。如果需要测试私有方法怎么办？</p>
-<p>使用反射机制获取这个私有方法。</p>
-<p>需要使用到的方法<code>Class.getDeclaredMethod(), Method.setAccessible(), Method.invoke()</code></p>
-<p>方法流程：</p>
-<ol>
-<li>获取需要测试类的class对象（可以使用class.forname的方法，也可以直接使用[ClassName].class的方法）</li>
-<li>获取该class对象指定的私有方法的Method对象（<code>[classobj.class].getDeclaredMethod(String name, Class&lt;?&gt;... parameterTypes)</code>）</li>
-<li>修改私有方法的访问性为公开访问(<code>[MethodObj].setAccessible(true)</code>。</li>
-<li>实例化需要测试类的object对象(<code>[ClassName.class].newInstance()</code>)</li>
-<li>调用该私有方法测试(<code>[MethodObj].invoke([objectInstance], ...)</code>)</li>
-</ol>
+<h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>输入的图像为image，image可以为黑白或者RGB彩色。（channel=1 or channel=3)</p>
+<p>所以输入的image.ndim可能为2或者为3.</p>
+<p>第一部分代码需要判断黑白和彩色的情况.</p>
+<p>图片过滤器会将原图片的尺寸缩小,因为进行卷积操作是将原图像的一个矩阵框中的点和过滤核相乘后在求和得到新图像的一个点的值。</p>
+<p>【公式和图像】</p>
+<p>假设原始图像的高和宽为img_h, img_w，过滤核的大小为filter_h, filter_w。这里有一个条件过滤核的长宽都必须为为奇数。（为什么呢？）那么除掉最中心的像素外，过滤核可以被分为四等份。每一部分的长宽(padding)为 pad_h = (filter_h-1)/2和pad_w = (filter_w-1)/2</p>
+<p>那么输出的尺寸为img_h - pad_h * 2 和 img_w - pad_w *2，因为图像两边都需要减去pad_h的尺寸。</p>
+<p>同时我们还要给过滤器做一个上下左右变换。因为卷积操作和相关操作的过滤核移动方向是相反的，应该是从下往上，从右往左。</p>
+<h2 id="实例代码："><a href="#实例代码：" class="headerlink" title="实例代码："></a>实例代码：</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_imfilter</span><span class="params">(image, filter)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  Apply a filter to an image. Return the filtered image.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  Args</span></span><br><span class="line"><span class="string">  - image: numpy nd-array of dim (m, n, c)</span></span><br><span class="line"><span class="string">  - filter: numpy nd-array of dim (k, k)</span></span><br><span class="line"><span class="string">  Returns</span></span><br><span class="line"><span class="string">  - filtered_image: numpy nd-array of dim (m, n, c)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  HINTS:</span></span><br><span class="line"><span class="string">  - You may not use any libraries that do the work for you. Using numpy to work</span></span><br><span class="line"><span class="string">   with matrices is fine and encouraged. Using opencv or similar to do the</span></span><br><span class="line"><span class="string">   filtering for you is not allowed.</span></span><br><span class="line"><span class="string">  - I encourage you to try implementing this naively first, just be aware that</span></span><br><span class="line"><span class="string">   it may take an absurdly long time to run. You will need to get a function</span></span><br><span class="line"><span class="string">   that takes a reasonable amount of time to run so that the TAs can verify</span></span><br><span class="line"><span class="string">   your code works.</span></span><br><span class="line"><span class="string">  - Remember these are RGB images, accounting for the final image dimension.</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">assert</span> filter.shape[<span class="number">0</span>] % <span class="number">2</span> == <span class="number">1</span></span><br><span class="line">  <span class="keyword">assert</span> filter.shape[<span class="number">1</span>] % <span class="number">2</span> == <span class="number">1</span></span><br><span class="line">  <span class="comment"># 默认设置图像的通道数，如果只有一个通道，即输入图片是二维的。</span></span><br><span class="line">  channel = <span class="number">1</span></span><br><span class="line">  <span class="comment"># 如果输入维度=3，通道数等于第三个维度的元素数量</span></span><br><span class="line">  <span class="keyword">if</span> image.ndim == <span class="number">3</span>:</span><br><span class="line">    channel = image.shape[<span class="number">2</span>]</span><br><span class="line">  <span class="comment"># 获取图片的长度和宽度</span></span><br><span class="line">  image_h, image_w = image.shape[:<span class="number">2</span>]</span><br><span class="line">  <span class="comment"># 将过滤核做上下、左右翻转，以确保是卷积操作而不是相关操作</span></span><br><span class="line">  filter = np.flipud(filter)</span><br><span class="line">  filter = np.fliplr(filter)</span><br><span class="line">  <span class="comment"># 获取过滤核的长度和宽度</span></span><br><span class="line">  filter_h, filter_w = filter.shape</span><br><span class="line">  pad_h = (filter_h - <span class="number">1</span>) // <span class="number">2</span></span><br><span class="line">  pad_w = (filter_w - <span class="number">1</span>) // <span class="number">2</span></span><br><span class="line">  <span class="comment"># 先扩充原图像,为了不影响原图像，需要复制一份图像</span></span><br><span class="line">  image_cp = image.copy()</span><br><span class="line">  image_cp = np.pad(image_cp,[(pad_h,pad_h),(pad_w,pad_w),(<span class="number">0</span>,<span class="number">0</span>)],<span class="string">"constant"</span>)</span><br><span class="line">  <span class="comment"># 生成过滤后的图片的空容器，尺寸可以是原本的尺寸，在这里为了下面坐标转换方便，扩大了长宽。</span></span><br><span class="line">  filtered_image = np.zeros(image_cp.shape)</span><br><span class="line">  <span class="comment"># 第一层是对于不同的channel做卷积  </span></span><br><span class="line">  <span class="keyword">for</span> i <span class="keyword">in</span> range(channel):</span><br><span class="line">    <span class="comment"># 第二层是高度y轴像素遍历</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(pad_h,image_h+pad_h):</span><br><span class="line">        <span class="comment"># 第三层是宽度x轴像素遍历</span></span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> range(pad_w,image_w+pad_w):</span><br><span class="line">            <span class="comment"># 算法核心，加上上面的翻转式卷积操作，单独来看是相关操作。其实可以通过 step=-1来做</span></span><br><span class="line">            filtered_image[j,k,i] = np.sum(np.multiply(image_cp[j-pad_h:j+pad_h+<span class="number">1</span>,k-pad_w:k+pad_w+<span class="number">1</span>,i],filter))</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> filtered_image[pad_h:image_h+pad_h, pad_w:image_w+pad_w,:]</span><br></pre></td></tr></table></figure>
+
 <hr>
-<h3 id="样例代码-1"><a href="#样例代码-1" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// PrivateMethodClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">privatePlus</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> a + b;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrivateMethodClassTest.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClassTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrivatePlus1</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException </span>&#123;</span><br><span class="line">        Class cls = Class.forName(<span class="string">"PrivateMethodClass"</span>);</span><br><span class="line">        Method msd = cls.getDeclaredMethod(<span class="string">"privatePlus"</span>, <span class="keyword">int</span>.class, <span class="keyword">int</span>.class);</span><br><span class="line">        msd.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        Object obj = cls.newInstance();</span><br><span class="line">        <span class="keyword">int</span> res = (Integer)msd.invoke(obj, <span class="number">4</span>,<span class="number">6</span>);</span><br><span class="line">        assertEquals(<span class="number">10</span>, res);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/privateTest" target="_blank" rel="noopener">week2:privateTest</a></p>
+<p>相关链接：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/33194385" target="_blank" rel="noopener">卷积与互相关的一点探讨</a></p>
 ]]></content>
-      <tags>
-        <tag>软件测试</tag>
-        <tag>Java</tag>
-      </tags>
+  </entry>
+  <entry>
+    <title>软件测试week1 note</title>
+    <url>/2019/09/09/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95week1-note/</url>
+    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title>用阿里云服务器自己搭建2do同步caldav服务器</title>
@@ -175,11 +213,6 @@
       </tags>
   </entry>
   <entry>
-    <title>软件测试week1 note</title>
-    <url>/2019/09/09/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95week1-note/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>软件测试week2 note</title>
     <url>/2019/09/16/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95week2-note/</url>
     <content><![CDATA[<h2 id="Fault-failure-and-error"><a href="#Fault-failure-and-error" class="headerlink" title="Fault, failure and error"></a>Fault, failure and error</h2><p>example</p>
@@ -192,54 +225,9 @@
 <h2 id="Hamcrest-Common-Matchers"><a href="#Hamcrest-Common-Matchers" class="headerlink" title="Hamcrest Common Matchers"></a>Hamcrest Common Matchers</h2><h2 id="如何测试标准输出中的字符串？"><a href="#如何测试标准输出中的字符串？" class="headerlink" title="如何测试标准输出中的字符串？"></a>如何测试标准输出中的字符串？</h2><h2 id="如何测试Main方法？"><a href="#如何测试Main方法？" class="headerlink" title="如何测试Main方法？"></a>如何测试Main方法？</h2>]]></content>
   </entry>
   <entry>
-    <title>用python写一个过滤器</title>
-    <url>/2019/09/27/%E7%94%A8python%E5%86%99%E4%B8%80%E4%B8%AA%E8%BF%87%E6%BB%A4%E5%99%A8/</url>
-    <content><![CDATA[<p>计算机视觉课Assigment2的内容.</p>
-<p>要求写出一个图像的过滤器出来。</p>
-<h2 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h2><p><strong>Image Filtering.</strong>Image filtering (or convolution) is a fundamental image processing tool. You will be writing your own function to implement image filtering from scratch. More specifically, you will implement my_imfilter()which imitates the filter2Dfunction in the OpenCV library. As specified in student_code.py, your filtering algorithm must</p>
-<p>(1) support grayscale and color images</p>
-<p>(2) support arbitrary shaped filters, as long as both dimensions are odd</p>
-<p>(e.g. 7x9 filters but not 4x5 filters)</p>
-<p>(3) pad the input image with zeros or reflected image content</p>
-<p>(4) return a filtered image which is the same resolution as the input image.</p>
-<p>使用numpy，PIL。</p>
-<h2 id="步骤："><a href="#步骤：" class="headerlink" title="步骤："></a>步骤：</h2><ol>
-<li>导入图像（不属于本次任务）</li>
-<li>生成过滤核（不属于本次任务）</li>
-<li>padding</li>
-<li>calculate</li>
-<li>normalization（不属于本次任务，即假设过滤核和图像已经做好了正则化）</li>
-<li>截断</li>
-</ol>
-<hr>
-<h2 id="函数定义"><a href="#函数定义" class="headerlink" title="函数定义"></a>函数定义</h2><p>图像过滤器的核心是一个function，函数的定义</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_imfilter</span><span class="params">(image, filter)</span></span></span><br><span class="line"><span class="function">	<span class="title">return</span> <span class="title">filtered_image</span></span></span><br></pre></td></tr></table></figure>
-
-<h2 id="设计思路"><a href="#设计思路" class="headerlink" title="设计思路"></a>设计思路</h2><p>输入的图像为image，image可以为黑白或者RGB彩色。（channel=1 or channel=3)</p>
-<p>所以输入的image.ndim可能为2或者为3.</p>
-<p>第一部分代码需要判断黑白和彩色的情况.</p>
-<p>图片过滤器会将原图片的尺寸缩小,因为进行卷积操作是将原图像的一个矩阵框中的点和过滤核相乘后在求和得到新图像的一个点的值。</p>
-<p>【公式和图像】</p>
-<p>假设原始图像的高和宽为img_h, img_w，过滤核的大小为filter_h, filter_w。这里有一个条件过滤核的长宽都必须为为奇数。（为什么呢？）那么除掉最中心的像素外，过滤核可以被分为四等份。每一部分的长宽(padding)为 pad_h = (filter_h-1)/2和pad_w = (filter_w-1)/2</p>
-<p>那么输出的尺寸为img_h - pad_h * 2 和 img_w - pad_w *2，因为图像两边都需要减去pad_h的尺寸。</p>
-<p>同时我们还要给过滤器做一个上下左右变换。因为卷积操作和相关操作的过滤核移动方向是相反的，应该是从下往上，从右往左。</p>
-<h2 id="实例代码："><a href="#实例代码：" class="headerlink" title="实例代码："></a>实例代码：</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_imfilter</span><span class="params">(image, filter)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  Apply a filter to an image. Return the filtered image.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  Args</span></span><br><span class="line"><span class="string">  - image: numpy nd-array of dim (m, n, c)</span></span><br><span class="line"><span class="string">  - filter: numpy nd-array of dim (k, k)</span></span><br><span class="line"><span class="string">  Returns</span></span><br><span class="line"><span class="string">  - filtered_image: numpy nd-array of dim (m, n, c)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  HINTS:</span></span><br><span class="line"><span class="string">  - You may not use any libraries that do the work for you. Using numpy to work</span></span><br><span class="line"><span class="string">   with matrices is fine and encouraged. Using opencv or similar to do the</span></span><br><span class="line"><span class="string">   filtering for you is not allowed.</span></span><br><span class="line"><span class="string">  - I encourage you to try implementing this naively first, just be aware that</span></span><br><span class="line"><span class="string">   it may take an absurdly long time to run. You will need to get a function</span></span><br><span class="line"><span class="string">   that takes a reasonable amount of time to run so that the TAs can verify</span></span><br><span class="line"><span class="string">   your code works.</span></span><br><span class="line"><span class="string">  - Remember these are RGB images, accounting for the final image dimension.</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">assert</span> filter.shape[<span class="number">0</span>] % <span class="number">2</span> == <span class="number">1</span></span><br><span class="line">  <span class="keyword">assert</span> filter.shape[<span class="number">1</span>] % <span class="number">2</span> == <span class="number">1</span></span><br><span class="line">  <span class="comment"># 默认设置图像的通道数，如果只有一个通道，即输入图片是二维的。</span></span><br><span class="line">  channel = <span class="number">1</span></span><br><span class="line">  <span class="comment"># 如果输入维度=3，通道数等于第三个维度的元素数量</span></span><br><span class="line">  <span class="keyword">if</span> image.ndim == <span class="number">3</span>:</span><br><span class="line">    channel = image.shape[<span class="number">2</span>]</span><br><span class="line">  <span class="comment"># 获取图片的长度和宽度</span></span><br><span class="line">  image_h, image_w = image.shape[:<span class="number">2</span>]</span><br><span class="line">  <span class="comment"># 将过滤核做上下、左右翻转，以确保是卷积操作而不是相关操作</span></span><br><span class="line">  filter = np.flipud(filter)</span><br><span class="line">  filter = np.fliplr(filter)</span><br><span class="line">  <span class="comment"># 获取过滤核的长度和宽度</span></span><br><span class="line">  filter_h, filter_w = filter.shape</span><br><span class="line">  pad_h = (filter_h - <span class="number">1</span>) // <span class="number">2</span></span><br><span class="line">  pad_w = (filter_w - <span class="number">1</span>) // <span class="number">2</span></span><br><span class="line">  <span class="comment"># 先扩充原图像,为了不影响原图像，需要复制一份图像</span></span><br><span class="line">  image_cp = image.copy()</span><br><span class="line">  image_cp = np.pad(image_cp,[(pad_h,pad_h),(pad_w,pad_w),(<span class="number">0</span>,<span class="number">0</span>)],<span class="string">"constant"</span>)</span><br><span class="line">  <span class="comment"># 生成过滤后的图片的空容器，尺寸可以是原本的尺寸，在这里为了下面坐标转换方便，扩大了长宽。</span></span><br><span class="line">  filtered_image = np.zeros(image_cp.shape)</span><br><span class="line">  <span class="comment"># 第一层是对于不同的channel做卷积  </span></span><br><span class="line">  <span class="keyword">for</span> i <span class="keyword">in</span> range(channel):</span><br><span class="line">    <span class="comment"># 第二层是高度y轴像素遍历</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(pad_h,image_h+pad_h):</span><br><span class="line">        <span class="comment"># 第三层是宽度x轴像素遍历</span></span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> range(pad_w,image_w+pad_w):</span><br><span class="line">            <span class="comment"># 算法核心，加上上面的翻转式卷积操作，单独来看是相关操作。其实可以通过 step=-1来做</span></span><br><span class="line">            filtered_image[j,k,i] = np.sum(np.multiply(image_cp[j-pad_h:j+pad_h+<span class="number">1</span>,k-pad_w:k+pad_w+<span class="number">1</span>,i],filter))</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> filtered_image[pad_h:image_h+pad_h, pad_w:image_w+pad_w,:]</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>相关链接：</p>
-<p><a href="https://zhuanlan.zhihu.com/p/33194385" target="_blank" rel="noopener">卷积与互相关的一点探讨</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>软件测试week3 note</title>
     <url>/2019/09/16/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95week3-note/</url>
     <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title>重建博客</title>
-    <url>/2019/09/08/%E9%87%8D%E5%BB%BA%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[<p>2019年4月的时候用hexo和github page创建过一个博客，但是在更换电脑的时候意外丢失了模版。后又恢复回来，只剩下了网页，，没有网站配置和md原始文件。</p>
-]]></content>
   </entry>
   <entry>
     <title>阅读日报20190911</title>
@@ -252,6 +240,12 @@
       <tags>
         <tag>阅读日报</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>重建博客</title>
+    <url>/2019/09/08/%E9%87%8D%E5%BB%BA%E5%8D%9A%E5%AE%A2/</url>
+    <content><![CDATA[<p>2019年4月的时候用hexo和github page创建过一个博客，但是在更换电脑的时候意外丢失了模版。后又恢复回来，只剩下了网页，，没有网站配置和md原始文件。</p>
+]]></content>
   </entry>
   <entry>
     <title>Kaldi入门(一):yesno项目</title>
