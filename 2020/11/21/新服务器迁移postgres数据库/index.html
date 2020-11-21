@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Linux,">
+  <meta name="keywords" content="运维, Postgres,">
 
 
 
@@ -79,20 +79,18 @@
 
 
 
-<meta name="description" content="用阿里云服务器自己搭建2do同步caldav服务器一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。流程非常简单。一个小时以内就可办完。使用">
-<meta name="keywords" content="Linux">
+<meta name="description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
+<meta name="keywords" content="运维, Postgres">
 <meta property="og:type" content="article">
-<meta property="og:title" content="用阿里云服务器自己搭建2do同步caldav服务器">
-<meta property="og:url" content="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/index.html">
+<meta property="og:title" content="新服务器迁移postgres数据库">
+<meta property="og:url" content="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
-<meta property="og:description" content="用阿里云服务器自己搭建2do同步caldav服务器一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。流程非常简单。一个小时以内就可办完。使用">
+<meta property="og:description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg">
-<meta property="og:updated_time" content="2020-05-01T09:49:16.797Z">
+<meta property="og:updated_time" content="2020-11-21T02:46:19.878Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="用阿里云服务器自己搭建2do同步caldav服务器">
-<meta name="twitter:description" content="用阿里云服务器自己搭建2do同步caldav服务器一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。流程非常简单。一个小时以内就可办完。使用">
-<meta name="twitter:image" content="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg">
+<meta name="twitter:title" content="新服务器迁移postgres数据库">
+<meta name="twitter:description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
 
 
 
@@ -122,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/">
+  <link rel="canonical" href="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/">
 
 
 
 
 
-  <title>用阿里云服务器自己搭建2do同步caldav服务器 | ChenMin's Blog</title>
+  <title>新服务器迁移postgres数据库 | ChenMin's Blog</title>
   
 
 
@@ -235,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Chen Min">
@@ -252,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">用阿里云服务器自己搭建2do同步caldav服务器</h1>
+          <h1 class="post-title" itemprop="name headline">新服务器迁移postgres数据库</h1>
         
 
         <div class="post-meta">
@@ -264,8 +262,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-23T17:33:29+08:00">
-                2019-09-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-21T09:39:33+08:00">
+                2020-11-21
               </time>
             
 
@@ -302,47 +300,33 @@
       
 
       
-        <h2 id="用阿里云服务器自己搭建2do同步caldav服务器"><a href="#用阿里云服务器自己搭建2do同步caldav服务器" class="headerlink" title="用阿里云服务器自己搭建2do同步caldav服务器"></a>用阿里云服务器自己搭建2do同步caldav服务器</h2><p>一个月前，把任务管理从Microsoft TO-DO迁移到2Do中，自己手上常用一台小米9和Macbook Pro，同步成了问题，不能使用icloud remainder。那就只有DropBox等服务可用。<br>因为Dropbox在国内不稳定的连接以及近阶段自己手上的梯子挂掉了，所以琢磨自己搭一个同步使用的服务器。<br>流程非常简单。一个小时以内就可办完。<br>使用到的:</p>
-<ol>
-<li>阿里云ECS低配版，如果使用学生版一个月9.5元。</li>
-<li>python3。</li>
-<li>radicale，使用python3编写的caldav服务器程序。</li>
-</ol>
-<h3 id="步骤一览"><a href="#步骤一览" class="headerlink" title="步骤一览:"></a>步骤一览:</h3><ol>
-<li>云服务器购买与登录</li>
-<li>安全组设置</li>
-<li>Python3环境</li>
-<li>安装radicale</li>
-<li>配置radicale</li>
-</ol>
-<hr>
-<h3 id="云服务器准备"><a href="#云服务器准备" class="headerlink" title="云服务器准备"></a>云服务器准备</h3><p>购买与登录的流程就自己搜索吧。我购买的是Ubunt的主机，也可以使用CentOS。</p>
-<p>需要注意的是在创建服务器实例之前，最好先将本机的ssh public key导入到阿里云中，并且新建实例后选择该public key，不然不能够在终端中登录，而阿里云提供的浏览器vnc完全不能用。也可以在创建实例后再创建public key，只是需要重启实例罢了。</p>
-<h3 id="安全组设置"><a href="#安全组设置" class="headerlink" title="安全组设置"></a>安全组设置</h3><p>阿里云默认关闭大多数端口，包括了我们这次要使用到的5232端口。所以请自行搜索“阿里云 安全组 端口开启“完成该步骤。</p>
-<h3 id="Python3的环境搭建"><a href="#Python3的环境搭建" class="headerlink" title="Python3的环境搭建"></a>Python3的环境搭建</h3><p>这一步大体上也是请搜索“Ubuntu python3“</p>
-<p>需要注意的是先使用<code>sudo apt-get update</code>更新本地软件目录。</p>
-<h3 id="安装radicale"><a href="#安装radicale" class="headerlink" title="安装radicale"></a>安装radicale</h3><p>这一步会很详细的讲。</p>
-<p>安装radicale</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m pip install --upgrade radicale</span><br></pre></td></tr></table></figure>
-
-<p>若是在本地使用，可以使用下面这个命令。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m radicale --config "" --storage-filesystem-folder=~/.var/lib/radicale/collections</span><br></pre></td></tr></table></figure>
-
-<p>然后访问 <a href="http://localhost:5232" target="_blank" rel="noopener">http://localhost:5232</a></p>
-<p>但是若在服务器上访问就无法访问。需要配置参数。</p>
-<p>我使用的配置有，把配置文件放在<code>/etc/radicale/config</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[server]</span><br><span class="line"># Bind all addresses</span><br><span class="line">hosts = 0.0.0.0:5232</span><br><span class="line">daemon = True</span><br><span class="line">[auth]</span><br><span class="line">type = htpasswd</span><br><span class="line">htpasswd_filename = /etc/radicale/users</span><br><span class="line">htpasswd_encryption = plain</span><br><span class="line">[storage]</span><br><span class="line">filesystem_folder = ~/.var/lib/radicale/collections</span><br></pre></td></tr></table></figure>
-
-<p>想详细了解更多配置选项可以查看<a href="https://radicale.org/configuration/" target="_blank" rel="noopener">configuration</a></p>
-<p>然后可以设置用户名和密码, 把配置文件放在<code>/etc/radicale/users</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user:password</span><br></pre></td></tr></table></figure>
-
-<p>然后启动就好了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m radicale</span><br></pre></td></tr></table></figure>
-
-<p>正常访问。</p>
-<p>然后在2Do的配置上选择就好了。</p>
-<p><img src="http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg" alt="2do"></p>
+        <p>课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。</p>
+<p>基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。</p>
+<h2 id="安装配置Postgres"><a href="#安装配置Postgres" class="headerlink" title="安装配置Postgres"></a>安装配置Postgres</h2><p>我觉得Postgres比MySQL好的一点在于其开源。且能实现数据库的基本功能。</p>
+<p>###服务器安装Postgres</p>
+<p><code>sudo apt-get install postgresql postgresql-client</code></p>
+<p>可以在本机安装一个postgres-client，免得在两个服务器之间来回登录。</p>
+<h3 id="配置postgres数据库账号和远程连接"><a href="#配置postgres数据库账号和远程连接" class="headerlink" title="配置postgres数据库账号和远程连接"></a>配置postgres数据库账号和远程连接</h3><p>登录新服务器，设置linux中的postgres用户密码</p>
+<p><code>sudo passwd postgres</code>或者<code>sudo -i -u postgres</code>，免密码登录。</p>
+<p>设置postgres 中postgres用户密码(以postgres用户登录)</p>
+<p><code>psql</code>进入数据库clinet软件</p>
+<p><code>postgres \password</code>设置数据库管理员postgres的密码</p>
+<h3 id="远程连接设置"><a href="#远程连接设置" class="headerlink" title="远程连接设置"></a>远程连接设置</h3><p>修改Postgres远程连接允许 </p>
+<p><code>sudo vim /etc/postgres/10/main/postgres.conf</code>， </p>
+<p>修改<code>listen_addresses</code>那一行为<code>listen_addresses = &#39;*&#39;</code>（有的公司要求不允许数据库开放外网访问，请谨慎该选项）。</p>
+<p>修改远程登录选项</p>
+<p><code>vim  /etc/postgres/10/main/pg_dba.conf</code></p>
+<p>添加新行</p>
+<p><code>host  all  all 0.0.0.0/0 md5</code> (不要使用trust，除非你想任何人能够访问你的数据库内容)</p>
+<p>重启服务以应用刚刚的修改</p>
+<p><code>sudo service postgresql restart</code></p>
+<p><a href="http://lazybios.com/2016/11/how-to-make-postgreSQL-can-be-accessed-from-remote-client/" target="_blank" rel="noopener">参考</a></p>
+<h2 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h2><p>Postgres 提供导出数据库数据和结构的程序。有两种方法，一种是在本机安装psql程序，新旧服务器都进行上面的远程连接设置，然后本机连接源服务器数据库dump备份文件，然后本机连接目标服务器数据库导入数据；另外一种是登录源服务器dump备份文件，再导出到目标服务器，在目标服务器执行导入操作。我使用的是比较麻烦的第二种。</p>
+<h3 id="备份数据库"><a href="#备份数据库" class="headerlink" title="备份数据库"></a>备份数据库</h3><p><code>pg_dump -h (ip or localhost) -U postgres databasename &gt; databasename.bak</code></p>
+<p>我是在服务器本地进行的操作，所以可以使用localhost。</p>
+<h3 id="恢复数据库"><a href="#恢复数据库" class="headerlink" title="恢复数据库"></a>恢复数据库</h3><p>恢复数据库指令不会创建新的数据库，所以需要先行在新的数据库中创建数据库 <code>create database databasename;</code></p>
+<p>然后执行<code>psql -h localhost -U postgres -d databasename &lt; databasename.bak</code>恢复数据库。</p>
+<p><a href="https://juejin.cn/post/6844904002409201671" target="_blank" rel="noopener">参考</a></p>
 
       
     </div>
@@ -360,7 +344,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Linux/" rel="tag"># Linux</a>
+            <a href="/tags/运维-Postgres/" rel="tag"># 运维, Postgres</a>
           
         </div>
       
@@ -373,8 +357,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/23/如何测试那些难以测试的方法/" rel="next" title="如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)">
-                <i class="fa fa-chevron-left"></i> 如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)
+              <a href="/2020/05/01/Kaldi入门-一-yesno项目/" rel="next" title="Kaldi入门(一):yesno项目">
+                <i class="fa fa-chevron-left"></i> Kaldi入门(一):yesno项目
               </a>
             
           </div>
@@ -382,10 +366,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/09/27/用python写一个过滤器/" rel="prev" title="用python写一个过滤器">
-                用python写一个过滤器 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -518,7 +498,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#用阿里云服务器自己搭建2do同步caldav服务器"><span class="nav-number">1.</span> <span class="nav-text">用阿里云服务器自己搭建2do同步caldav服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤一览"><span class="nav-number">1.1.</span> <span class="nav-text">步骤一览:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#云服务器准备"><span class="nav-number">1.2.</span> <span class="nav-text">云服务器准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安全组设置"><span class="nav-number">1.3.</span> <span class="nav-text">安全组设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3的环境搭建"><span class="nav-number">1.4.</span> <span class="nav-text">Python3的环境搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装radicale"><span class="nav-number">1.5.</span> <span class="nav-text">安装radicale</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Postgres"><span class="nav-number">1.</span> <span class="nav-text">安装配置Postgres</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置postgres数据库账号和远程连接"><span class="nav-number">1.1.</span> <span class="nav-text">配置postgres数据库账号和远程连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程连接设置"><span class="nav-number">1.2.</span> <span class="nav-text">远程连接设置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库迁移"><span class="nav-number">2.</span> <span class="nav-text">数据库迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#备份数据库"><span class="nav-number">2.1.</span> <span class="nav-text">备份数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#恢复数据库"><span class="nav-number">2.2.</span> <span class="nav-text">恢复数据库</span></a></li></ol></li></ol></div>
             
 
           </div>
