@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="运维,Postgres,">
 
 
 
@@ -79,14 +79,18 @@
 
 
 
+<meta name="description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
+<meta name="keywords" content="运维,Postgres">
 <meta property="og:type" content="article">
-<meta property="og:title" content="软件测试week3 note">
-<meta property="og:url" content="http://yoursite.com/2019/09/16/软件测试week3-note/index.html">
+<meta property="og:title" content="新服务器迁移postgres数据库">
+<meta property="og:url" content="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
+<meta property="og:description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-05-01T09:49:16.798Z">
+<meta property="og:updated_time" content="2020-11-21T06:49:02.133Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="软件测试week3 note">
+<meta name="twitter:title" content="新服务器迁移postgres数据库">
+<meta name="twitter:description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
 
 
 
@@ -116,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/09/16/软件测试week3-note/">
+  <link rel="canonical" href="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/">
 
 
 
 
 
-  <title>软件测试week3 note | ChenMin's Blog</title>
+  <title>新服务器迁移postgres数据库 | ChenMin's Blog</title>
   
 
 
@@ -229,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/16/软件测试week3-note/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Chen Min">
@@ -246,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">软件测试week3 note</h1>
+          <h1 class="post-title" itemprop="name headline">新服务器迁移postgres数据库</h1>
         
 
         <div class="post-meta">
@@ -258,8 +262,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-16T10:22:47+08:00">
-                2019-09-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-21T09:39:33+08:00">
+                2020-11-21
               </time>
             
 
@@ -296,7 +300,33 @@
       
 
       
-        
+        <p>课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。</p>
+<p>基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。</p>
+<h2 id="安装配置Postgres"><a href="#安装配置Postgres" class="headerlink" title="安装配置Postgres"></a>安装配置Postgres</h2><p>我觉得Postgres比MySQL好的一点在于其开源。且能实现数据库的基本功能。</p>
+<h3 id="服务器安装Postgres"><a href="#服务器安装Postgres" class="headerlink" title="服务器安装Postgres"></a>服务器安装Postgres</h3><p><code>sudo apt-get install postgresql postgresql-client</code></p>
+<p>可以在本机安装一个postgres-client，免得在两个服务器之间来回登录。</p>
+<h3 id="配置postgres数据库账号和远程连接"><a href="#配置postgres数据库账号和远程连接" class="headerlink" title="配置postgres数据库账号和远程连接"></a>配置postgres数据库账号和远程连接</h3><p>登录新服务器，设置linux中的postgres用户密码</p>
+<p><code>sudo passwd postgres</code>或者<code>sudo -i -u postgres</code>，免密码登录。</p>
+<p>设置postgres 中postgres用户密码(以postgres用户登录)</p>
+<p><code>psql</code>进入数据库clinet软件</p>
+<p><code>postgres \password</code>设置数据库管理员postgres的密码</p>
+<h3 id="远程连接设置"><a href="#远程连接设置" class="headerlink" title="远程连接设置"></a>远程连接设置</h3><p>修改Postgres远程连接允许 </p>
+<p><code>sudo vim /etc/postgres/10/main/postgres.conf</code>， </p>
+<p>修改<code>listen_addresses</code>那一行为<code>listen_addresses = &#39;*&#39;</code>（有的公司要求不允许数据库开放外网访问，请谨慎该选项）。</p>
+<p>修改远程登录选项</p>
+<p><code>vim  /etc/postgres/10/main/pg_dba.conf</code></p>
+<p>添加新行</p>
+<p><code>host  all  all 0.0.0.0/0 md5</code> (不要使用trust，除非你想任何人能够访问你的数据库内容)</p>
+<p>重启服务以应用刚刚的修改</p>
+<p><code>sudo service postgresql restart</code></p>
+<p><a href="http://lazybios.com/2016/11/how-to-make-postgreSQL-can-be-accessed-from-remote-client/" target="_blank" rel="noopener">参考</a></p>
+<h2 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h2><p>Postgres 提供导出数据库数据和结构的程序。有两种方法，一种是在本机安装psql程序，新旧服务器都进行上面的远程连接设置，然后本机连接源服务器数据库dump备份文件，然后本机连接目标服务器数据库导入数据；另外一种是登录源服务器dump备份文件，再导出到目标服务器，在目标服务器执行导入操作。我使用的是比较麻烦的第二种。</p>
+<h3 id="备份数据库"><a href="#备份数据库" class="headerlink" title="备份数据库"></a>备份数据库</h3><p><code>pg_dump -h (ip or localhost) -U postgres databasename &gt; databasename.bak</code></p>
+<p>我是在服务器本地进行的操作，所以可以使用localhost。</p>
+<h3 id="恢复数据库"><a href="#恢复数据库" class="headerlink" title="恢复数据库"></a>恢复数据库</h3><p>恢复数据库指令不会创建新的数据库，所以需要先行在新的数据库中创建数据库 <code>create database databasename;</code></p>
+<p>然后执行<code>psql -h localhost -U postgres -d databasename &lt; databasename.bak</code>恢复数据库。</p>
+<p><a href="https://juejin.cn/post/6844904002409201671" target="_blank" rel="noopener">参考</a></p>
+
       
     </div>
     
@@ -310,6 +340,14 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/运维/" rel="tag"># 运维</a>
+          
+            <a href="/tags/Postgres/" rel="tag"># Postgres</a>
+          
+        </div>
       
 
       
@@ -335,8 +373,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/16/软件测试week2-note/" rel="next" title="软件测试week2 note">
-                <i class="fa fa-chevron-left"></i> 软件测试week2 note
+              <a href="/2020/05/01/Kaldi入门-一-yesno项目/" rel="next" title="Kaldi入门(一):yesno项目">
+                <i class="fa fa-chevron-left"></i> Kaldi入门(一):yesno项目
               </a>
             
           </div>
@@ -344,10 +382,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/09/23/如何测试那些难以测试的方法/" rel="prev" title="如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)">
-                如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -399,8 +433,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -496,6 +539,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Postgres"><span class="nav-number">1.</span> <span class="nav-text">安装配置Postgres</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器安装Postgres"><span class="nav-number">1.1.</span> <span class="nav-text">服务器安装Postgres</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置postgres数据库账号和远程连接"><span class="nav-number">1.2.</span> <span class="nav-text">配置postgres数据库账号和远程连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程连接设置"><span class="nav-number">1.3.</span> <span class="nav-text">远程连接设置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库迁移"><span class="nav-number">2.</span> <span class="nav-text">数据库迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#备份数据库"><span class="nav-number">2.1.</span> <span class="nav-text">备份数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#恢复数据库"><span class="nav-number">2.2.</span> <span class="nav-text">恢复数据库</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
