@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="en">
+<html class="theme-next pisces use-motion" lang="en">
 <head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="运维, Postgres,">
+  <meta name="keywords" content="运维,Postgres,">
 
 
 
@@ -80,14 +80,14 @@
 
 
 <meta name="description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
-<meta name="keywords" content="运维, Postgres">
+<meta name="keywords" content="运维,Postgres">
 <meta property="og:type" content="article">
 <meta property="og:title" content="新服务器迁移postgres数据库">
 <meta property="og:url" content="http://yoursite.com/2020/11/21/新服务器迁移postgres数据库/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
 <meta property="og:description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-11-21T02:46:19.878Z">
+<meta property="og:updated_time" content="2020-11-21T06:49:02.133Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="新服务器迁移postgres数据库">
 <meta name="twitter:description" content="课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。 基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。 安装配置Postgres我觉得Postgre">
@@ -98,7 +98,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Pisces',
     version: '5.1.4',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
@@ -303,8 +303,7 @@
         <p>课题组要部署一个云服务，之前用的是我个人申请的学生版服务器，价格优惠。快到期需要续费，但是优惠版的服务器不能够继续以优惠价格续费，正常的价格是一千多每年。所以我决定新申请一个优惠版服务器，然后迁移Postgres数据库和部署的web server。</p>
 <p>基本步骤是购买新服务器（Ubuntu18.04版本），密码重设，为了方便登录也可以设置ssh免密码登录。</p>
 <h2 id="安装配置Postgres"><a href="#安装配置Postgres" class="headerlink" title="安装配置Postgres"></a>安装配置Postgres</h2><p>我觉得Postgres比MySQL好的一点在于其开源。且能实现数据库的基本功能。</p>
-<p>###服务器安装Postgres</p>
-<p><code>sudo apt-get install postgresql postgresql-client</code></p>
+<h3 id="服务器安装Postgres"><a href="#服务器安装Postgres" class="headerlink" title="服务器安装Postgres"></a>服务器安装Postgres</h3><p><code>sudo apt-get install postgresql postgresql-client</code></p>
 <p>可以在本机安装一个postgres-client，免得在两个服务器之间来回登录。</p>
 <h3 id="配置postgres数据库账号和远程连接"><a href="#配置postgres数据库账号和远程连接" class="headerlink" title="配置postgres数据库账号和远程连接"></a>配置postgres数据库账号和远程连接</h3><p>登录新服务器，设置linux中的postgres用户密码</p>
 <p><code>sudo passwd postgres</code>或者<code>sudo -i -u postgres</code>，免密码登录。</p>
@@ -344,12 +343,29 @@
       
         <div class="post-tags">
           
-            <a href="/tags/运维-Postgres/" rel="tag"># 运维, Postgres</a>
+            <a href="/tags/运维/" rel="tag"># 运维</a>
+          
+            <a href="/tags/Postgres/" rel="tag"># Postgres</a>
           
         </div>
       
 
       
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
       
       
 
@@ -455,7 +471,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">tags</span>
                 </a>
               </div>
@@ -474,6 +490,41 @@
                         <i class="fa fa-fw fa-globe"></i>GitHub</a>
                   </span>
                 
+            </div>
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li class="recent_posts_li">
+                    <a href="/2020/11/21/新服务器迁移postgres数据库/" title="新服务器迁移postgres数据库" target="_blank">新服务器迁移postgres数据库</a>
+                  </li>
+                
+                  <li class="recent_posts_li">
+                    <a href="/2020/05/01/Kaldi入门-一-yesno项目/" title="Kaldi入门(一):yesno项目" target="_blank">Kaldi入门(一):yesno项目</a>
+                  </li>
+                
+                  <li class="recent_posts_li">
+                    <a href="/2020/01/10/python程序同步webdav网盘（坚果云、owncloud）/" title="python程序同步webdav网盘（坚果云、owncloud)" target="_blank">python程序同步webdav网盘（坚果云、owncloud)</a>
+                  </li>
+                
+                  <li class="recent_posts_li">
+                    <a href="/2019/09/27/用python写一个过滤器/" title="用python写一个过滤器" target="_blank">用python写一个过滤器</a>
+                  </li>
+                
+                  <li class="recent_posts_li">
+                    <a href="/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/" title="用阿里云服务器自己搭建2do同步caldav服务器" target="_blank">用阿里云服务器自己搭建2do同步caldav服务器</a>
+                  </li>
+                
+              </ul>
             </div>
           
 
@@ -498,7 +549,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Postgres"><span class="nav-number">1.</span> <span class="nav-text">安装配置Postgres</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置postgres数据库账号和远程连接"><span class="nav-number">1.1.</span> <span class="nav-text">配置postgres数据库账号和远程连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程连接设置"><span class="nav-number">1.2.</span> <span class="nav-text">远程连接设置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库迁移"><span class="nav-number">2.</span> <span class="nav-text">数据库迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#备份数据库"><span class="nav-number">2.1.</span> <span class="nav-text">备份数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#恢复数据库"><span class="nav-number">2.2.</span> <span class="nav-text">恢复数据库</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装配置Postgres"><span class="nav-number">1.</span> <span class="nav-text">安装配置Postgres</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器安装Postgres"><span class="nav-number">1.1.</span> <span class="nav-text">服务器安装Postgres</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置postgres数据库账号和远程连接"><span class="nav-number">1.2.</span> <span class="nav-text">配置postgres数据库账号和远程连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程连接设置"><span class="nav-number">1.3.</span> <span class="nav-text">远程连接设置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库迁移"><span class="nav-number">2.</span> <span class="nav-text">数据库迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#备份数据库"><span class="nav-number">2.1.</span> <span class="nav-text">备份数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#恢复数据库"><span class="nav-number">2.2.</span> <span class="nav-text">恢复数据库</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -536,7 +587,7 @@
 
 
 
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
 
 
 
@@ -560,6 +611,12 @@
       </div>
     
 
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
     
 
   </div>
@@ -636,6 +693,13 @@
   
   
 
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
   
   <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
@@ -695,6 +759,43 @@
   
 
   
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "default";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+          flOptions.iconStyle = "default";
+      
+          flOptions.boxForm = "vertical";
+      
+          flOptions.position = "topRight";
+      
+          flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
   
 
   
