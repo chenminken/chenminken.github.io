@@ -97,4 +97,4 @@ python3 -m radicale
 
 然后在2Do的配置上选择就好了。
 
-![2do](http://ww4.sinaimg.cn/large/006y8mN6gy1g79utaszl2j313a0tu4en.jpg)
+![2do](../_images/2do.png)
