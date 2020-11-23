@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="计算机网络,Linux,">
 
 
 
@@ -79,13 +79,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="ChenMin&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/archives/2020/05/index.html">
+<meta name="description" content="帮同学的实验室配置静态IP，将其中的流程和关键记录下来。 校园网内使用DHCP来分配IP地址，有效期为2天，如果两天之内设备未续租，IP地址会被收回。 实验室的服务器需要远程登陆，需要一个静态IP来保证服务器的可访问性。 在申请了几个静态IP之后，会获得一组数据。1) 172.xxx.xxx.xxx、2) 255.255.255.0、3) 172.xxx.xxx.254、4) vlanxx。其中1">
+<meta name="keywords" content="计算机网络,Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu 18.04静态IP设置和遇到的虚拟机网卡问题">
+<meta property="og:url" content="http://yoursite.com/2020/11/23/Ubuntu-18-04静态IP设置和遇到的虚拟机网卡问题/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
+<meta property="og:description" content="帮同学的实验室配置静态IP，将其中的流程和关键记录下来。 校园网内使用DHCP来分配IP地址，有效期为2天，如果两天之内设备未续租，IP地址会被收回。 实验室的服务器需要远程登陆，需要一个静态IP来保证服务器的可访问性。 在申请了几个静态IP之后，会获得一组数据。1) 172.xxx.xxx.xxx、2) 255.255.255.0、3) 172.xxx.xxx.254、4) vlanxx。其中1">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-11-23T11:34:51.927Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ChenMin&#39;s Blog">
+<meta name="twitter:title" content="Ubuntu 18.04静态IP设置和遇到的虚拟机网卡问题">
+<meta name="twitter:description" content="帮同学的实验室配置静态IP，将其中的流程和关键记录下来。 校园网内使用DHCP来分配IP地址，有效期为2天，如果两天之内设备未续租，IP地址会被收回。 实验室的服务器需要远程登陆，需要一个静态IP来保证服务器的可访问性。 在申请了几个静态IP之后，会获得一组数据。1) 172.xxx.xxx.xxx、2) 255.255.255.0、3) 172.xxx.xxx.254、4) vlanxx。其中1">
 
 
 
@@ -115,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/archives/2020/05/">
+  <link rel="canonical" href="http://yoursite.com/2020/11/23/Ubuntu-18-04静态IP设置和遇到的虚拟机网卡问题/">
 
 
 
 
 
-  <title>Archive | ChenMin's Blog</title>
+  <title>Ubuntu 18.04静态IP设置和遇到的虚拟机网卡问题 | ChenMin's Blog</title>
   
 
 
@@ -140,7 +145,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -214,72 +219,185 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
-
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        Um..! 17 posts in total. Keep on posting.
-      </span>
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2020">2020</h1>
-          </div>
-        
-        
-
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/23/Ubuntu-18-04静态IP设置和遇到的虚拟机网卡问题/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2020/05/01/Kaldi入门-一-yesno项目/" itemprop="url">
-              
-                <span itemprop="name">Kaldi入门(一):yesno项目</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">Ubuntu 18.04静态IP设置和遇到的虚拟机网卡问题</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2020-05-01T17:37:05+08:00" content="2020-05-01">
-          05-01
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-23T19:34:17+08:00">
+                2020-11-23
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
 
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+      
 
+      
+        <p>帮同学的实验室配置静态IP，将其中的流程和关键记录下来。</p>
+<p>校园网内使用DHCP来分配IP地址，有效期为2天，如果两天之内设备未续租，IP地址会被收回。</p>
+<p>实验室的服务器需要远程登陆，需要一个静态IP来保证服务器的可访问性。</p>
+<p>在申请了几个静态IP之后，会获得一组数据。1) 172.xxx.xxx.xxx、2) 255.255.255.0、3) 172.xxx.xxx.254、4) vlanxx。其中1）是静态IP的地址，2）是子网掩码，也可以用24表示。3）网关地址，4）交换机的vlan接口，由交换机管理员配置。</p>
+<p>学校中由网络中心运营管理交换机，需要先联系工程师在网关中添加vlanxx接口，并且把服务器的所有MAC地址绑定静态IP地址组。</p>
+<p>服务器的操作系统和版本是Ubuntu 18.04 server。网络管理使用netplan。之前同学装了gnome-shell。我先尝试使用简易桌面自带的网络管理程序，ifconfig -a发现对网卡配置不起作用。</p>
+<p>直接修改netplan程序位于\etc\netplan\01-netcfg.yaml。</p>
+<p>当时该文件基本的结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">network:</span><br><span class="line">  version: 2</span><br><span class="line">  renderer: networkd</span><br><span class="line">  ethernets:</span><br><span class="line">    eno1:</span><br><span class="line">      dhcp4: true</span><br><span class="line">  bridges:</span><br><span class="line">    vir0br:</span><br><span class="line">      interfaces: [eno1]</span><br><span class="line">      dhcp4: true</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的就是eno1和vir0br。其中dhcp4代表着是否使用ipv4版本的dhcp地址分配。</p>
+<p>vir0br是<a href="https://virt-manager.org/" target="_blank" rel="noopener">https://virt-manager.org/</a>虚拟机管理器NAT模式下的网桥接口。服务器中通过virt-manager运行着windows 系统。</p>
+<p>配置静态ip需要修改eno1的配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">eno1:</span><br><span class="line">  dhcp4: no</span><br><span class="line">  addresses: [172.xxx.xxx.xxx/24]</span><br><span class="line">  gateway4: 172.xxx.xxx.254</span><br><span class="line">  nameservers:</span><br><span class="line">    addresses: [8.8.8.8, 8.8.4.4]</span><br></pre></td></tr></table></figure>
+
+<p>然后netplan apply。接着ifconfig -a 查看网卡ip是否更改，如果没有更改，不用着急。很可能是配置文件的问题。而不是需要重启或者sudo service networking restart重启网卡。</p>
+<p>需要注意的是这里有一个bridge。bridge是一个虚拟网络设备，具有网络设备的特征，可以配置IP，MAC地址等。bridge不分接入进来的设备是虚拟的还是物理的，当eno1加入vir0br之后，从外面网络收到的数据包将无条件的转发给vir0br，自己变成一根网线。先用brctl show查看网桥状态然后.ifconfig &lt;网桥名&gt; down, brctl delbr &lt;网桥名&gt;删除网桥，将01-netcf.yaml中的bridge 部分删掉。（但是会造成虚拟机网络异常）。 重新netplan apply，完成静态IP的配置。</p>
+<p>对于windows虚拟机的网络配置还在检索学习中。网上较少Linux寄主机，Windows虚拟机的配置情况。</p>
+
+      
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/计算机网络/" rel="tag"># 计算机网络</a>
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/22/OpenCV和numpy笔记/" rel="next" title="OpenCV和numpy笔记">
+                <i class="fa fa-chevron-left"></i> OpenCV和numpy笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/23/以Notion为基础的自我管理体系/" rel="prev" title="以Notion为基础的自我管理体系">
+                以Notion为基础的自我管理体系 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -287,6 +405,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -550,6 +672,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

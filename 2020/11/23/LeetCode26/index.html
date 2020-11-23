@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="Leet Code,">
 
 
 
@@ -79,13 +79,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="ChenMin&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/archives/2020/05/index.html">
+<meta name="description" content="关键词：数组去重题目描述：  Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.Do not allocate extra space for another array, you must do th">
+<meta name="keywords" content="Leet Code">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode26">
+<meta property="og:url" content="http://yoursite.com/2020/11/23/LeetCode26/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
+<meta property="og:description" content="关键词：数组去重题目描述：  Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.Do not allocate extra space for another array, you must do th">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-11-23T11:37:57.232Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ChenMin&#39;s Blog">
+<meta name="twitter:title" content="LeetCode26">
+<meta name="twitter:description" content="关键词：数组去重题目描述：  Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.Do not allocate extra space for another array, you must do th">
 
 
 
@@ -115,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/archives/2020/05/">
+  <link rel="canonical" href="http://yoursite.com/2020/11/23/LeetCode26/">
 
 
 
 
 
-  <title>Archive | ChenMin's Blog</title>
+  <title>LeetCode26 | ChenMin's Blog</title>
   
 
 
@@ -140,7 +145,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -214,72 +219,172 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
-
-      <span class="archive-page-counter">
-        
-        
-        
-          
-        
-        Um..! 17 posts in total. Keep on posting.
-      </span>
-
-      
-
-        
-        
-        
-
-        
-          
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2020">2020</h1>
-          </div>
-        
-        
-
-        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/23/LeetCode26/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chen Min">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ChenMin's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2020/05/01/Kaldi入门-一-yesno项目/" itemprop="url">
-              
-                <span itemprop="name">Kaldi入门(一):yesno项目</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">LeetCode26</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2020-05-01T17:37:05+08:00" content="2020-05-01">
-          05-01
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-23T19:37:45+08:00">
+                2020-11-23
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
 
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+      
 
+      
+        <p>关键词：数组去重<br>题目描述：</p>
+<blockquote>
+<p>Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.<br>Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.</p>
+</blockquote>
+<p>这道题需要更改原始输入的数组并且返回去重后的数组长度。<br>分为两部分来思考：</p>
+<ol>
+<li>去重数组长度计算<br>注意到这里的输入数组是排好序的数组。所以可以用指针从头开始比较。并设置去重后的数组长度为count=0. 用count也可以作为数组的指针，来表示数组在count这个位置的数值。<br>肯定要遍历整个数组，用一个for循环和i指针来做。<br>在这里我一开始的思路是判断count指针和i指针大小，如果count指针所指的数小则将count++。最后count就是要求的数组长度。</li>
+<li>更改原始输入数组<br>题目要求必须在原始数组上进行更改而不能新建一个数组。有一个隐含前提，去重数组的长度一定小于等于原始数组。那么，我们可以直接将大于当前指针的数放入前一个已经去重的数之后。<br>所以我们需要一个指针来保存去重列表的末尾部分,恰好这个指针就是count，当i指针遍历整个数组遇到一个新的数（只需要比count的大）时，可以将这个数放入count之后的格子里，直到i遍历到达了整个原始数组的尾部。</li>
+</ol>
+<p>需要考虑边界条件。当输入数组nums的长度为0和1时，这个算法是否能够给出0,1的返回值？不能。count=0的初始设置在nums.length=1时还是等于0.因为count==i==0，并不会进入自增的过程。可以考虑返回count+1，然后在算法顶端加一个判断条件。数组的长度是否为0，如果是0，直接返回0就好了。</p>
+<p>Java版本的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">removeDuplicates</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(nums.length == <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>; i&lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums[count] &lt; nums[i])&#123;</span><br><span class="line">            nums[count+<span class="number">1</span>] = nums[i];</span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Leet-Code/" rel="tag"># Leet Code</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/23/学习Kaldi：中文Aishell项目（上）/" rel="next" title="学习Kaldi：中文Aishell项目（上）">
+                <i class="fa fa-chevron-left"></i> 学习Kaldi：中文Aishell项目（上）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -287,6 +392,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -550,6 +659,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 

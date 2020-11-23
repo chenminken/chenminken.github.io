@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="软件测试,Java,">
+  <meta name="keywords" content="Python,">
 
 
 
@@ -79,18 +79,25 @@
 
 
 
-<meta name="description" content="如何测试标准输出中的内容标准输出：System.out.println() 方法流程：  使用OutputStream, System.setOut重定向输出流 使用System.getProperty(&amp;quot;line.separator)来正确的测试下一行 使用System.setOut, System.out恢复输出流   样例代码1234567891011121314151617181">
-<meta name="keywords" content="软件测试,Java">
+<meta name="description" content="我的主力编程语言现在是Python，平时也会使用Python写一些小脚本做文件处理（更简单一些的操作会直接用Shell命令）。基本不会接触到GUI界面的编写。但是呢，对于我而言命令行是可行的方案，但是如果要把代码交给没有编程基础的人，并且没有相关的开发环境时。就需要GUI和打包技术了。最近就遇到一个情况需要开发一个类似图片直方图均衡的功能给和课题组合作的医生使用，工作的电脑是离线的，医生没有编程基">
+<meta name="keywords" content="Python">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何测试那些难以测试的方法？(stdin&#x2F;stdout标准输入输出，文件，main方法，private私有方法)">
-<meta property="og:url" content="http://yoursite.com/2019/09/23/如何测试那些难以测试的方法/index.html">
+<meta property="og:title" content="使用Python开发桌面应用的一个体验">
+<meta property="og:url" content="http://yoursite.com/2020/11/23/使用Python开发桌面应用的一个体验/index.html">
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
-<meta property="og:description" content="如何测试标准输出中的内容标准输出：System.out.println() 方法流程：  使用OutputStream, System.setOut重定向输出流 使用System.getProperty(&amp;quot;line.separator)来正确的测试下一行 使用System.setOut, System.out恢复输出流   样例代码1234567891011121314151617181">
+<meta property="og:description" content="我的主力编程语言现在是Python，平时也会使用Python写一些小脚本做文件处理（更简单一些的操作会直接用Shell命令）。基本不会接触到GUI界面的编写。但是呢，对于我而言命令行是可行的方案，但是如果要把代码交给没有编程基础的人，并且没有相关的开发环境时。就需要GUI和打包技术了。最近就遇到一个情况需要开发一个类似图片直方图均衡的功能给和课题组合作的医生使用，工作的电脑是离线的，医生没有编程基">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-11-21T07:26:16.626Z">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4328467-710adfe03afb783c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4328467-ed074f31a3c0e3c5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4328467-810f6bb1f62c1b28.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4328467-c5680a11224d48c6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4328467-f81686eae4d335f7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4328467-ac276dcf8ac724f9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2020-11-23T11:36:39.921Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何测试那些难以测试的方法？(stdin&#x2F;stdout标准输入输出，文件，main方法，private私有方法)">
-<meta name="twitter:description" content="如何测试标准输出中的内容标准输出：System.out.println() 方法流程：  使用OutputStream, System.setOut重定向输出流 使用System.getProperty(&amp;quot;line.separator)来正确的测试下一行 使用System.setOut, System.out恢复输出流   样例代码1234567891011121314151617181">
+<meta name="twitter:title" content="使用Python开发桌面应用的一个体验">
+<meta name="twitter:description" content="我的主力编程语言现在是Python，平时也会使用Python写一些小脚本做文件处理（更简单一些的操作会直接用Shell命令）。基本不会接触到GUI界面的编写。但是呢，对于我而言命令行是可行的方案，但是如果要把代码交给没有编程基础的人，并且没有相关的开发环境时。就需要GUI和打包技术了。最近就遇到一个情况需要开发一个类似图片直方图均衡的功能给和课题组合作的医生使用，工作的电脑是离线的，医生没有编程基">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/4328467-710adfe03afb783c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
 
@@ -120,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/09/23/如何测试那些难以测试的方法/">
+  <link rel="canonical" href="http://yoursite.com/2020/11/23/使用Python开发桌面应用的一个体验/">
 
 
 
 
 
-  <title>如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法) | ChenMin's Blog</title>
+  <title>使用Python开发桌面应用的一个体验 | ChenMin's Blog</title>
   
 
 
@@ -233,7 +240,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/23/如何测试那些难以测试的方法/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/23/使用Python开发桌面应用的一个体验/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Chen Min">
@@ -250,7 +257,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">如何测试那些难以测试的方法？(stdin/stdout标准输入输出，文件，main方法，private私有方法)</h1>
+          <h1 class="post-title" itemprop="name headline">使用Python开发桌面应用的一个体验</h1>
         
 
         <div class="post-meta">
@@ -262,8 +269,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-09-23T15:23:33+08:00">
-                2019-09-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-23T19:36:00+08:00">
+                2020-11-23
               </time>
             
 
@@ -300,32 +307,40 @@
       
 
       
-        <h2 id="如何测试标准输出中的内容"><a href="#如何测试标准输出中的内容" class="headerlink" title="如何测试标准输出中的内容"></a>如何测试标准输出中的内容</h2><p>标准输出：<code>System.out.println()</code></p>
-<p>方法流程：</p>
+        <p>我的主力编程语言现在是Python，平时也会使用Python写一些小脚本做文件处理（更简单一些的操作会直接用Shell命令）。基本不会接触到GUI界面的编写。但是呢，对于我而言命令行是可行的方案，但是如果要把代码交给没有编程基础的人，并且没有相关的开发环境时。就需要GUI和打包技术了。最近就遇到一个情况需要开发一个类似图片直方图均衡的功能给和课题组合作的医生使用，工作的电脑是离线的，医生没有编程基础。</p>
+<p>要求条件：</p>
 <ol>
-<li>使用<code>OutputStream, System.setOut</code>重定向输出流</li>
-<li>使用<code>System.getProperty(&quot;line.separator)</code>来正确的测试下一行</li>
-<li>使用<code>System.setOut, System.out</code>恢复输出流</li>
+<li><p>使用Python，快捷开发；</p>
+</li>
+<li><p>GUI；</p>
+</li>
+<li><p>独立的EXE可执行文件。</p>
+</li>
 </ol>
-<hr>
-<h3 id="样例代码"><a href="#样例代码" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PrintClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"Just follow your heard"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrintClassTest.java,忽略掉import的部分</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrintClassTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrintSome</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 重定向标准输出到指定printstream中</span></span><br><span class="line">		OutputStream os = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">		PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">		System.setOut(ps);</span><br><span class="line">		<span class="comment">// 执行测试代码</span></span><br><span class="line">		PrintClass pc = <span class="keyword">new</span> PrintClass();</span><br><span class="line">		pc.printSome();</span><br><span class="line">		assertEquals(<span class="string">"Just follow your heard"</span></span><br><span class="line">						+ System.getProperty(<span class="string">"line.separator"</span>),</span><br><span class="line">                os.toString());</span><br><span class="line">		<span class="comment">// 恢复重定向</span></span><br><span class="line">		PrintStream originalOut = System.out;</span><br><span class="line">    	System.setOut(originalOut);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/printtest" target="_blank" rel="noopener">week2:printtest</a></p>
-<h2 id="如何测试私有方法"><a href="#如何测试私有方法" class="headerlink" title="如何测试私有方法"></a>如何测试私有方法</h2><p>Java中的私有方法不能通过obj.method()的方式来调用。如果需要测试私有方法怎么办？</p>
-<p>使用反射机制获取这个私有方法。</p>
-<p>需要使用到的方法<code>Class.getDeclaredMethod(), Method.setAccessible(), Method.invoke()</code></p>
-<p>方法流程：</p>
+<p>技术栈：</p>
 <ol>
-<li>获取需要测试类的class对象（可以使用class.forname的方法，也可以直接使用[ClassName].class的方法）</li>
-<li>获取该class对象指定的私有方法的Method对象（<code>[classobj.class].getDeclaredMethod(String name, Class&lt;?&gt;... parameterTypes)</code>）</li>
-<li>修改私有方法的访问性为公开访问(<code>[MethodObj].setAccessible(true)</code>。</li>
-<li>实例化需要测试类的object对象(<code>[ClassName.class].newInstance()</code>)</li>
-<li>调用该私有方法测试(<code>[MethodObj].invoke([objectInstance], ...)</code>)</li>
+<li><p>Numpy，用于对像素数组进行映射；</p>
+</li>
+<li><p>Pillow，图像库，底层调用numpy；</p>
+</li>
+<li><p>TkinterDND2使用Python内置的Tkinter的改进版，支持基础的code based UI和文件拖拽功能。使用conda安装。</p>
+</li>
 </ol>
-<hr>
-<h3 id="样例代码-1"><a href="#样例代码-1" class="headerlink" title="样例代码"></a>样例代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PrivateMethodClass.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClass</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">privatePlus</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> a + b;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// PrivateMethodClassTest.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrivateMethodClassTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testPrivatePlus1</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException </span>&#123;</span><br><span class="line">        Class cls = Class.forName(<span class="string">"PrivateMethodClass"</span>);</span><br><span class="line">        Method msd = cls.getDeclaredMethod(<span class="string">"privatePlus"</span>, <span class="keyword">int</span>.class, <span class="keyword">int</span>.class);</span><br><span class="line">        msd.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        Object obj = cls.newInstance();</span><br><span class="line">        <span class="keyword">int</span> res = (Integer)msd.invoke(obj, <span class="number">4</span>,<span class="number">6</span>);</span><br><span class="line">        assertEquals(<span class="number">10</span>, res);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>完整代码在：<a href="https://github.com/chenminken/software-testing/tree/master/week2/privateTest" target="_blank" rel="noopener">week2:privateTest</a></p>
+<p>我的开发环境是OS X，幸好之前一个老师分配的Windows虚拟机还能用。Python环境3.7.3。</p>
+<h2 id="第一版"><a href="#第一版" class="headerlink" title="第一版"></a>第一版</h2><p><img src="https://upload-images.jianshu.io/upload_images/4328467-710adfe03afb783c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"> </p>
+<p>支持选取图片文件夹，递归查找其中的jpg文件并处理。</p>
+<h3 id="文件夹选取功能"><a href="#文件夹选取功能" class="headerlink" title="文件夹选取功能"></a>文件夹选取功能</h3><h3 id><a href="#" class="headerlink" title></a><strong><img src="https://upload-images.jianshu.io/upload_images/4328467-ed074f31a3c0e3c5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></strong></h3><h3 id="图片处理函数"><a href="#图片处理函数" class="headerlink" title="图片处理函数"></a>图片处理函数</h3><h3 id="-1"><a href="#-1" class="headerlink" title></a><strong><img src="https://upload-images.jianshu.io/upload_images/4328467-810f6bb1f62c1b28.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></strong></h3><p>简单的对图片像素映射到0-255的范围。能够使得标本图片更容易标注。</p>
+<h3 id="恢复函数"><a href="#恢复函数" class="headerlink" title="恢复函数"></a>恢复函数</h3><h3 id="-2"><a href="#-2" class="headerlink" title></a><strong><img src="https://upload-images.jianshu.io/upload_images/4328467-c5680a11224d48c6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></strong></h3><p>相当于图片处理函数的逆操作，在图片处理的时候保存了每一张图片的处理参数。</p>
+<h3 id="性能分析："><a href="#性能分析：" class="headerlink" title="性能分析："></a>性能分析：</h3><h3 id="-3"><a href="#-3" class="headerlink" title></a><strong><img src="https://upload-images.jianshu.io/upload_images/4328467-f81686eae4d335f7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></strong></h3><p>因为一个标本采集的图片有接近2000张，测试时预估大约需要8分钟才能完成一个标本的图片优化。而费</p>
+<p>使用cProfile进行性能分析，61张图片要18秒多。平均一秒3张图片。主要的时间消耗是在转换成numpy矩阵、保存图片和图片处理函数。基本是不能够再优化的。那么就要从数据量方面考虑，是否每一张图片都需要优化并标注？其实不是的，每一个标本只需要选取最多10张进行标注，那么由医生选取并且拖放到指定界面会更快捷。</p>
+<h2 id="第二版"><a href="#第二版" class="headerlink" title="第二版"></a>第二版</h2><h2 id="-4"><a href="#-4" class="headerlink" title></a><strong><img src="https://upload-images.jianshu.io/upload_images/4328467-ac276dcf8ac724f9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></strong></h2><p>第二版添加了拖放功能并且把文件夹选取的功能去掉了。可以拖放多个文件，并且会筛选处理其中的jpg文件。</p>
+<p>PS: 连标题都懒得改。。</p>
+<h2 id="pyinstaller打包"><a href="#pyinstaller打包" class="headerlink" title="pyinstaller打包"></a>pyinstaller打包</h2><p>使用pip 安装pyinstaller打包，pyinstaller是系统依赖的，在什么系统打包，在什么系统使用。坑很多。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用pyinstaller遇到几个bug。six，warm</p>
+<p>打包太大了。有500MB。代码量180行。</p>
+<p>加了Frame之后文件夹输入框就不更新了。可能的原因是pack和grid在frame和widge之间混用。或者混用Tkinter和TkinterDnD2。因为文件夹选取的方案被替换掉了。所以这个bug不再存在。</p>
+<p>conda环境安装耗时较久。</p>
+<p>还是java香。</p>
 
       
     </div>
@@ -343,9 +358,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/软件测试/" rel="tag"># 软件测试</a>
-          
-            <a href="/tags/Java/" rel="tag"># Java</a>
+            <a href="/tags/Python/" rel="tag"># Python</a>
           
         </div>
       
@@ -373,8 +386,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/16/软件测试week2-note/" rel="next" title="软件测试week2 note">
-                <i class="fa fa-chevron-left"></i> 软件测试week2 note
+              <a href="/2020/11/23/以Notion为基础的自我管理体系/" rel="next" title="以Notion为基础的自我管理体系">
+                <i class="fa fa-chevron-left"></i> 以Notion为基础的自我管理体系
               </a>
             
           </div>
@@ -383,8 +396,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/09/23/用阿里云服务器自己搭建2do同步caldav服务器/" rel="prev" title="用阿里云服务器自己搭建2do同步caldav服务器">
-                用阿里云服务器自己搭建2do同步caldav服务器 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/11/23/学习Kaldi：中文Aishell项目（上）/" rel="prev" title="学习Kaldi：中文Aishell项目（上）">
+                学习Kaldi：中文Aishell项目（上） <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -553,7 +566,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何测试标准输出中的内容"><span class="nav-number">1.</span> <span class="nav-text">如何测试标准输出中的内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#样例代码"><span class="nav-number">1.1.</span> <span class="nav-text">样例代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何测试私有方法"><span class="nav-number">2.</span> <span class="nav-text">如何测试私有方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#样例代码-1"><span class="nav-number">2.1.</span> <span class="nav-text">样例代码</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一版"><span class="nav-number">1.</span> <span class="nav-text">第一版</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件夹选取功能"><span class="nav-number">1.1.</span> <span class="nav-text">文件夹选取功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#null"><span class="nav-number">1.2.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图片处理函数"><span class="nav-number">1.3.</span> <span class="nav-text">图片处理函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#-1"><span class="nav-number">1.4.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#恢复函数"><span class="nav-number">1.5.</span> <span class="nav-text">恢复函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#-2"><span class="nav-number">1.6.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能分析："><span class="nav-number">1.7.</span> <span class="nav-text">性能分析：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#-3"><span class="nav-number">1.8.</span> <span class="nav-text"></span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二版"><span class="nav-number">2.</span> <span class="nav-text">第二版</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#-4"><span class="nav-number">3.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pyinstaller打包"><span class="nav-number">4.</span> <span class="nav-text">pyinstaller打包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
