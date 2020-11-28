@@ -87,24 +87,24 @@
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
 <meta property="og:description" content="这篇文章是学习Kaldi的第二篇。对应SUSTech CS310课程的Lab6和Lab7。第一篇里探索了如何对toy language（仅包含两个单音素单词）进行语言模型的建模。至于训练和解码的部分，时间条件和理解能力暂时不允许去整理。本篇文章的主要目标是理解复杂的中文多音素语言模型和使用AiShell语料集来真实的训练出一个可用的中文语音识别模型。完整的AiShell例子包含GMM-HMM和神经">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1246.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1247.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1248.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1249.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1250.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1251.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1252.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1253.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1254.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1255.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1256.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1257.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1258.png">
-<meta property="og:updated_time" content="2020-11-23T11:45:13.541Z">
+<meta property="og:image" content="http://yoursite.com/images/1246.png">
+<meta property="og:image" content="http://yoursite.com/images/1247.png">
+<meta property="og:image" content="http://yoursite.com/images/1248.png">
+<meta property="og:image" content="http://yoursite.com/images/1249.png">
+<meta property="og:image" content="http://yoursite.com/images/1250.png">
+<meta property="og:image" content="http://yoursite.com/images/1251.png">
+<meta property="og:image" content="http://yoursite.com/images/1252.png">
+<meta property="og:image" content="http://yoursite.com/images/1253.png">
+<meta property="og:image" content="http://yoursite.com/images/1254.png">
+<meta property="og:image" content="http://yoursite.com/images/1255.png">
+<meta property="og:image" content="http://yoursite.com/images/1256.png">
+<meta property="og:image" content="http://yoursite.com/images/1257.png">
+<meta property="og:image" content="http://yoursite.com/images/1258.png">
+<meta property="og:updated_time" content="2020-11-28T16:23:31.389Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习Kaldi：中文Aishell项目（上）">
 <meta name="twitter:description" content="这篇文章是学习Kaldi的第二篇。对应SUSTech CS310课程的Lab6和Lab7。第一篇里探索了如何对toy language（仅包含两个单音素单词）进行语言模型的建模。至于训练和解码的部分，时间条件和理解能力暂时不允许去整理。本篇文章的主要目标是理解复杂的中文多音素语言模型和使用AiShell语料集来真实的训练出一个可用的中文语音识别模型。完整的AiShell例子包含GMM-HMM和神经">
-<meta name="twitter:image" content="http://yoursite.com/2020/11/23/_images/1246.png">
+<meta name="twitter:image" content="http://yoursite.com/images/1246.png">
 
 
 
@@ -312,8 +312,8 @@
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2020-11-23T19:45:13+08:00">
-                2020-11-23
+              <time title="Post modified" itemprop="dateModified" datetime="2020-11-29T00:23:31+08:00">
+                2020-11-29
               </time>
             
           </span>
@@ -420,11 +420,11 @@
 <h2 id="查看结果"><a href="#查看结果" class="headerlink" title="查看结果"></a>查看结果</h2><p>中文语音识别的准确度通常使用CER（Char Error Rate）来表示。因为中文中字是最小语义单位，而英文中词是基本语义单位。<br>和上一篇文章差不多的命令。脚本的运行结果保存在了exp目录下。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for x in exp/*/decode_test; do [ -d $x ] &amp;&amp; grep WER $x/cer_* | utils/best_wer.sh; done 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
 
-<p>训练出来的结果如下：<br><img src="../_images/1246.png" alt="训练结果"></p>
-<p>可以<code>cat RESULTS</code>，和官方跑出来的结果做一下对比。<br><img src="../_images/1247.png" alt="RESULTS"><br>需要注意的是，和上篇文章的实验不一样的是，输出的结果是多行的，因为执行了多次的实验，上面的脚本输出的是每次实验最好的结果。<br>我自己跑出来的最好结果是tri5a的cer_14_0.5而RESULTS中的GMM-HMM模型中最好的结果是tri5a的cer_13_0.5。两者CER都是12.12。每次实验本身都有一定的随机性。结果有一些误差是没问题的。为了确认模型有被正确的训练，查看自己结果的<code>tri5a/decode_test/cer_13_0.5</code>的CER是12.18，恰好不是最优解而已。这里的13和14是lmwt（语言模型权重）。具体的可以看上一篇文章。<br><img src="../_images/1248.png" alt="cer_13_0.5"></p>
-<h2 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h2><p>使用命令<code>cat run.sh | grep &quot;#&quot;</code>将run.sh脚本中的环节注释提取打印出来。其中倒数2，4行是我们在一开始注释掉的。可以看到基本可以分为准备、训练和获取结果三个部分。<br><img src="../_images/1249.png" alt="run.sh注释部分"></p>
+<p>训练出来的结果如下：<br><img src="/images/1246.png" alt="训练结果"></p>
+<p>可以<code>cat RESULTS</code>，和官方跑出来的结果做一下对比。<br><img src="/images/1247.png" alt="RESULTS"><br>需要注意的是，和上篇文章的实验不一样的是，输出的结果是多行的，因为执行了多次的实验，上面的脚本输出的是每次实验最好的结果。<br>我自己跑出来的最好结果是tri5a的cer_14_0.5而RESULTS中的GMM-HMM模型中最好的结果是tri5a的cer_13_0.5。两者CER都是12.12。每次实验本身都有一定的随机性。结果有一些误差是没问题的。为了确认模型有被正确的训练，查看自己结果的<code>tri5a/decode_test/cer_13_0.5</code>的CER是12.18，恰好不是最优解而已。这里的13和14是lmwt（语言模型权重）。具体的可以看上一篇文章。<br><img src="/images/1248.png" alt="cer_13_0.5"></p>
+<h2 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h2><p>使用命令<code>cat run.sh | grep &quot;#&quot;</code>将run.sh脚本中的环节注释提取打印出来。其中倒数2，4行是我们在一开始注释掉的。可以看到基本可以分为准备、训练和获取结果三个部分。<br><img src="/images/1249.png" alt="run.sh注释部分"></p>
 <h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><ol>
-<li>下载语料集<br>需要注意的是aishell语料集有大概20GB的大小。意味着需要很长的时间才能下载下来。我是直接用服务器里提前下好的语料集。<br><img src="../_images/1250.png" alt="aishell目录概览"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/download_and_untar.sh $data $data_url data_aishell || exit 1;</span><br></pre></td></tr></table></figure>
+<li>下载语料集<br>需要注意的是aishell语料集有大概20GB的大小。意味着需要很长的时间才能下载下来。我是直接用服务器里提前下好的语料集。<br><img src="/images/1250.png" alt="aishell目录概览"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/download_and_untar.sh $data $data_url data_aishell || exit 1;</span><br></pre></td></tr></table></figure>
 
 </li>
 </ol>
@@ -435,10 +435,10 @@
 </li>
 </ol>
 <p>这个脚本的功能主要是将<code>resource_aishell</code>下的<code>lexicon.txt</code>复制到<code>data/local/dict</code>中。并且提取出<code>nonsilence_phones.txt</code>、<code>optional_silence.txt</code>、<code>silence_phones.txt</code>和<code>extra_questions.txt</code>。用到了很多awk和perl的脚本。没看懂。（要是看懂了，第一次assignment就不会搞砸了）<br>那就要求自己看懂把。</p>
-<p><img src="../_images/1251.png" alt="lexicon.txt"></p>
-<p><img src="../_images/1252.png" alt="提取extra_questions.txt的代码"></p>
-<p><img src="../_images/1253.png" alt="extra_questions.txt部分内容"></p>
-<p><img src="../_images/1254.png" alt="提取nonsilence_phones.txt代码"><br>每行代表一组相同的base phone,包含各种不同的重音或者声调。<br><img src="../_images/1255.png" alt="nonsilence_phones.txt部分内容"></p>
+<p><img src="/images/1251.png" alt="lexicon.txt"></p>
+<p><img src="/images/1252.png" alt="提取extra_questions.txt的代码"></p>
+<p><img src="/images/1253.png" alt="extra_questions.txt部分内容"></p>
+<p><img src="/images/1254.png" alt="提取nonsilence_phones.txt代码"><br>每行代表一组相同的base phone,包含各种不同的重音或者声调。<br><img src="/images/1255.png" alt="nonsilence_phones.txt部分内容"></p>
 <ol start="3">
 <li>Data preparation<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/aishell_data_prep.sh $data/data_aishell/wav $data/data_aishell/transcript || exit 1;</span><br></pre></td></tr></table></figure>
 
@@ -451,12 +451,12 @@
 
 <p>上面shell脚本的目的是创建L.fst，音素模型，其中fst是Finite State Transducers（有限状态转换器）的缩写。找到这篇<a href="https://blog.csdn.net/DuishengChen/article/details/52473918" target="_blank" rel="noopener">Kaldi学习笔记 – 构建字典FST脚本 – prepare_lang.sh 关键内容解析</a>详细的说明了这个脚本的工作。而<a href="https://blog.csdn.net/mengjianmuzi/article/details/99499343" target="_blank" rel="noopener">关于prepare_lang的一点理解</a>给脚本进行了一些翻译和注释。</p>
 <blockquote>
-<p><a href="https://www.jianshu.com/p/4ad2add56b25" target="_blank" rel="noopener">Kaldi中FST(Finite State Transducer)含义及其可视化</a><br>L.fst: 音素词典（Phonetic Dictionary or Lexicon）模型，phone symbols作为输入，word symbols作为输出，如图Figure 1所示。<br><img src="../_images/1256.png" alt="Figure 1 L.fst结构"><br>L_disambig.fst是为了消除模棱两可（disambiguation）而引入的模型，表述为 the lexicon with disambiguation symbols。分歧的情况如：一个词是另一个词的前缀，cat 和 cats在同一个词典中，则需要”k ae t #1”； 有同音的词，red: “r eh d #1”, read: “r eh d #2”。</p>
+<p><a href="https://www.jianshu.com/p/4ad2add56b25" target="_blank" rel="noopener">Kaldi中FST(Finite State Transducer)含义及其可视化</a><br>L.fst: 音素词典（Phonetic Dictionary or Lexicon）模型，phone symbols作为输入，word symbols作为输出，如图Figure 1所示。<br><img src="/images/1256.png" alt="Figure 1 L.fst结构"><br>L_disambig.fst是为了消除模棱两可（disambiguation）而引入的模型，表述为 the lexicon with disambiguation symbols。分歧的情况如：一个词是另一个词的前缀，cat 和 cats在同一个词典中，则需要”k ae t #1”； 有同音的词，red: “r eh d #1”, read: “r eh d #2”。</p>
 </blockquote>
 <p>我一直疑惑<code>lexiconp.txt</code>是怎么生成的，查了好久。结果竟然只是一段在词和音素之间插入1.0的代码：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if [[ ! -f $srcdir/lexiconp.txt ]]; then</span><br><span class="line">  echo &quot;**Creating $srcdir/lexiconp.txt from $srcdir/lexicon.txt&quot;</span><br><span class="line">  perl -ape &apos;s/(\S+\s+)(.+)/$&#123;1&#125;1.0\t$2/;&apos; &lt; $srcdir/lexicon.txt &gt; $srcdir/lexiconp.txt || exit 1;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
 
-<p><img src="../_images/1257.png" alt="lexiconp.txt"><br>那么L.fst是怎么得到的呢？<br>通过<code>make_lexicon_fst.py</code>（现有的博客都说是.pl结尾，可能kaldi重构了）。还有一个消歧义的过程。具体的就看不懂了。<a href="https://shiweipku.gitbooks.io/chinese-doc-of-kaldi/content/decoding_graph_test.html" target="_blank" rel="noopener">解码图创建示例（测试阶段）</a>里有较为详细的文档讲解。</p>
+<p><img src="/images/1257.png" alt="lexiconp.txt"><br>那么L.fst是怎么得到的呢？<br>通过<code>make_lexicon_fst.py</code>（现有的博客都说是.pl结尾，可能kaldi重构了）。还有一个消歧义的过程。具体的就看不懂了。<a href="https://shiweipku.gitbooks.io/chinese-doc-of-kaldi/content/decoding_graph_test.html" target="_blank" rel="noopener">解码图创建示例（测试阶段）</a>里有较为详细的文档讲解。</p>
 <h4 id="5-LM-training"><a href="#5-LM-training" class="headerlink" title="5. LM training"></a>5. LM training</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local/aishell_train_lms.sh || exit 1;</span><br></pre></td></tr></table></figure>
 
 <p>这个shell脚本读取<code>data/local/train/text</code>,<code>data/local/dict/lexicon.txt</code><br>得到text的计数文件<code>word.counts</code>并以<code>word.counts</code>为基础添加<code>lexicon.txt</code>中的字（除了SIL）出现的次数到<code>unigram.counts</code>中。我就没深入看下去了，期间用到的脚本文件有:<code>get_word_map.pl</code>、<code>train_lm.sh --arpa --lmtype 3gram-mincount $dir || exit 1</code>;这个步骤的结果保存在<code>data/local/lm/3gram-mincount/lm_unpruned.gz</code>中。</p>
@@ -464,7 +464,7 @@
 
 <p>这个步骤是编译G.fst并将LG串联起来。</p>
 <blockquote>
-<p><a href="https://www.jianshu.com/p/4ad2add56b25" target="_blank" rel="noopener">Kaldi中FST(Finite State Transducer)含义及其可视化</a><br>G.fst: 语言模型，大部分是FSA（finite state acceptor, i.e. 每个arc的输入输出是相同的），如图Figure 2所示。<br><img src="../_images/1258.png" alt="Figure 2 G.fst结构（由指令词识别1-gram语法产生，disambiguation symbol #0 未加入）
+<p><a href="https://www.jianshu.com/p/4ad2add56b25" target="_blank" rel="noopener">Kaldi中FST(Finite State Transducer)含义及其可视化</a><br>G.fst: 语言模型，大部分是FSA（finite state acceptor, i.e. 每个arc的输入输出是相同的），如图Figure 2所示。<br><img src="/images/1258.png" alt="Figure 2 G.fst结构（由指令词识别1-gram语法产生，disambiguation symbol #0 未加入）
 "></p>
 </blockquote>
 <blockquote>

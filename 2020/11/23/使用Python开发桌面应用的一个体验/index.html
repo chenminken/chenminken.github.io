@@ -87,17 +87,17 @@
 <meta property="og:site_name" content="ChenMin&#39;s Blog">
 <meta property="og:description" content="我的主力编程语言现在是Python，平时也会使用Python写一些小脚本做文件处理（更简单一些的操作会直接用Shell命令）。基本不会接触到GUI界面的编写。但是呢，对于我而言命令行是可行的方案，但是如果要把代码交给没有编程基础的人，并且没有相关的开发环境时。就需要GUI和打包技术了。最近就遇到一个情况需要开发一个类似图片直方图均衡的功能给和课题组合作的医生使用，工作的电脑是离线的，医生没有编程基">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1240.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1241.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1242.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1243.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1244.png">
-<meta property="og:image" content="http://yoursite.com/2020/11/23/_images/1245.png">
-<meta property="og:updated_time" content="2020-11-23T11:42:52.983Z">
+<meta property="og:image" content="http://yoursite.com/images/1240.png">
+<meta property="og:image" content="http://yoursite.com/images/1241.png">
+<meta property="og:image" content="http://yoursite.com/images/1242.png">
+<meta property="og:image" content="http://yoursite.com/images/1243.png">
+<meta property="og:image" content="http://yoursite.com/images/1244.png">
+<meta property="og:image" content="http://yoursite.com/images/1245.png">
+<meta property="og:updated_time" content="2020-11-28T16:22:19.904Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Python开发桌面应用的一个体验">
 <meta name="twitter:description" content="我的主力编程语言现在是Python，平时也会使用Python写一些小脚本做文件处理（更简单一些的操作会直接用Shell命令）。基本不会接触到GUI界面的编写。但是呢，对于我而言命令行是可行的方案，但是如果要把代码交给没有编程基础的人，并且没有相关的开发环境时。就需要GUI和打包技术了。最近就遇到一个情况需要开发一个类似图片直方图均衡的功能给和课题组合作的医生使用，工作的电脑是离线的，医生没有编程基">
-<meta name="twitter:image" content="http://yoursite.com/2020/11/23/_images/1240.png">
+<meta name="twitter:image" content="http://yoursite.com/images/1240.png">
 
 
 
@@ -305,8 +305,8 @@
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2020-11-23T19:42:52+08:00">
-                2020-11-23
+              <time title="Post modified" itemprop="dateModified" datetime="2020-11-29T00:22:19+08:00">
+                2020-11-29
               </time>
             
           </span>
@@ -411,13 +411,13 @@
 </li>
 </ol>
 <p>我的开发环境是OS X，幸好之前一个老师分配的Windows虚拟机还能用。Python环境3.7.3。</p>
-<h2 id="第一版"><a href="#第一版" class="headerlink" title="第一版"></a>第一版</h2><p><img src="../_images/1240.png" alt="image.png"> </p>
+<h2 id="第一版"><a href="#第一版" class="headerlink" title="第一版"></a>第一版</h2><p><img src="/images/1240.png" alt="image.png"> </p>
 <p>支持选取图片文件夹，递归查找其中的jpg文件并处理。</p>
-<h3 id="文件夹选取功能"><a href="#文件夹选取功能" class="headerlink" title="文件夹选取功能"></a>文件夹选取功能</h3><h3 id><a href="#" class="headerlink" title></a><strong><img src="../_images/1241.png" alt="image.png"></strong></h3><h3 id="图片处理函数"><a href="#图片处理函数" class="headerlink" title="图片处理函数"></a>图片处理函数</h3><h3 id="-1"><a href="#-1" class="headerlink" title></a><strong><img src="../_images/1242.png" alt="image.png"></strong></h3><p>简单的对图片像素映射到0-255的范围。能够使得标本图片更容易标注。</p>
-<h3 id="恢复函数"><a href="#恢复函数" class="headerlink" title="恢复函数"></a>恢复函数</h3><h3 id="-2"><a href="#-2" class="headerlink" title></a><strong><img src="../_images/1243.png" alt="image.png"></strong></h3><p>相当于图片处理函数的逆操作，在图片处理的时候保存了每一张图片的处理参数。</p>
-<h3 id="性能分析："><a href="#性能分析：" class="headerlink" title="性能分析："></a>性能分析：</h3><h3 id="-3"><a href="#-3" class="headerlink" title></a><strong><img src="../_images/1244.png" alt="image.png"></strong></h3><p>因为一个标本采集的图片有接近2000张，测试时预估大约需要8分钟才能完成一个标本的图片优化。而费</p>
+<h3 id="文件夹选取功能"><a href="#文件夹选取功能" class="headerlink" title="文件夹选取功能"></a>文件夹选取功能</h3><h3 id><a href="#" class="headerlink" title></a><strong><img src="/images/1241.png" alt="image.png"></strong></h3><h3 id="图片处理函数"><a href="#图片处理函数" class="headerlink" title="图片处理函数"></a>图片处理函数</h3><h3 id="-1"><a href="#-1" class="headerlink" title></a><strong><img src="/images/1242.png" alt="image.png"></strong></h3><p>简单的对图片像素映射到0-255的范围。能够使得标本图片更容易标注。</p>
+<h3 id="恢复函数"><a href="#恢复函数" class="headerlink" title="恢复函数"></a>恢复函数</h3><h3 id="-2"><a href="#-2" class="headerlink" title></a><strong><img src="/images/1243.png" alt="image.png"></strong></h3><p>相当于图片处理函数的逆操作，在图片处理的时候保存了每一张图片的处理参数。</p>
+<h3 id="性能分析："><a href="#性能分析：" class="headerlink" title="性能分析："></a>性能分析：</h3><h3 id="-3"><a href="#-3" class="headerlink" title></a><strong><img src="/images/1244.png" alt="image.png"></strong></h3><p>因为一个标本采集的图片有接近2000张，测试时预估大约需要8分钟才能完成一个标本的图片优化。而费</p>
 <p>使用cProfile进行性能分析，61张图片要18秒多。平均一秒3张图片。主要的时间消耗是在转换成numpy矩阵、保存图片和图片处理函数。基本是不能够再优化的。那么就要从数据量方面考虑，是否每一张图片都需要优化并标注？其实不是的，每一个标本只需要选取最多10张进行标注，那么由医生选取并且拖放到指定界面会更快捷。</p>
-<h2 id="第二版"><a href="#第二版" class="headerlink" title="第二版"></a>第二版</h2><h2 id="-4"><a href="#-4" class="headerlink" title></a><strong><img src="../_images/1245.png" alt="image.png"></strong></h2><p>第二版添加了拖放功能并且把文件夹选取的功能去掉了。可以拖放多个文件，并且会筛选处理其中的jpg文件。</p>
+<h2 id="第二版"><a href="#第二版" class="headerlink" title="第二版"></a>第二版</h2><h2 id="-4"><a href="#-4" class="headerlink" title></a><strong><img src="/images/1245.png" alt="image.png"></strong></h2><p>第二版添加了拖放功能并且把文件夹选取的功能去掉了。可以拖放多个文件，并且会筛选处理其中的jpg文件。</p>
 <p>PS: 连标题都懒得改。。</p>
 <h2 id="pyinstaller打包"><a href="#pyinstaller打包" class="headerlink" title="pyinstaller打包"></a>pyinstaller打包</h2><p>使用pip 安装pyinstaller打包，pyinstaller是系统依赖的，在什么系统打包，在什么系统使用。坑很多。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用pyinstaller遇到几个bug。six，warm</p>
